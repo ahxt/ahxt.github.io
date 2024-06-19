@@ -43,11 +43,11 @@
 .paper-box {
     display: flex;
     justify-content: left;
-    align-items: center;
+    align-items: top;
     flex-direction: row;
     flex-wrap: wrap;
     border-bottom: 1px #efefef solid;
-    padding: 2em 0 2em 0;
+    padding: 0em 0 1.5em 0;
     
 
     .paper-box-image{
@@ -57,7 +57,7 @@
         order: 2;
         img {
             max-width: 400px;
-            box-shadow: 3px 3px 6px #888;
+            box-shadow: 6px 6px 8px #888;
             object-fit: cover;
         }
     }
@@ -71,14 +71,14 @@
         .paper-box-image{
             justify-content: left;
             min-width: 200px;
-            max-width: 40%;
+            max-width: 35%;
             order: 1;
         }
         
         .paper-box-text{
             justify-content: left;
             padding-left: 2em;
-            max-width: 60%;
+            max-width: 65%;
             order: 2;
         }
 
@@ -105,5 +105,6 @@ h1:before, .anchor:before {
     margin-left: -.5em;
     color: white;
     background-color: #00369f;
-    font-size: .8em;
+    font-size: 0.85em;
+    border-radius: 10;
 }

@@ -28,9 +28,19 @@ div.highlighter-rouge, figure.highlight {
   .highlight {
     margin: 0;
     font-family: $monospace;
-    font-size: $type-size-7;
+    font-size: $type-size-6;
     line-height: 1.8;
   }
+}
+
+.highlighter-rouge{
+  background-color: #7a8288;
+  color: white;
+  margin-bottom: 0.1em;
+  padding: 0.1em;
+  font-size: $type-size-6;
+  border: 0px solid $border-color;
+  border-radius: 5;
 }
 
 .highlight table td { padding: 5px; }

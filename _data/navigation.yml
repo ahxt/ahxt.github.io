@@ -4,19 +4,19 @@ main:
     url: "/#about-me"
 
   - title: "News"
-    url: "/#-news"
+    url: "/#news"
 
   - title: "Publications"
-    url: "/#-publications"
+    url: "/#publications"
 
-  - title: "Honors and Awards"
-    url: "/#-honors-and-awards"
+  - title: "Group"
+    url: "/group.html"
 
-  - title: "Educations"
-    url: "/#-educations"
+  # - title: "Internships"
+  #   url: "/#internships"
 
-  - title: "Invited Talks"
-    url: "/#-invited-talks"
+  # - title: "Awards"
+  #   url: "/#awards"
 
-  - title: "Internships"
-    url: "/#-internships"
+  # - title: "CV"
+  #   url: "/files/Xiaotian_CV.pdf"
