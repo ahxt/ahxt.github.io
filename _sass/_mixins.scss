@@ -15,7 +15,8 @@
    ========================================================================== */
 
 @function em($target, $context: $doc-font-size) {
-  @return ($target / $context) * 1em;
+  // @return ($target / $context) * 1em;
+  @return ($target / $context) * 1em * $doc-font-size / 100;
 }
 
 
