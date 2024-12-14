@@ -6,30 +6,31 @@
 # `jekyll serve`. If you change this file, please restart the server process.
 
 # Site Settings
-title                    : "Lorem ipsum"
-description              : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. "
-repository               : "RayeRen/acad-homepage.github.io"
-google_scholar_stats_use_cdn : true
+title                    : "Xiaotian (Max) Han"
+description              : "xhan (at) case.edu"
+repository               : "ahxt/ahxt.github.io"
+google_scholar_stats_use_cdn : false
+updateon                 : "11/20/2024"
 
 # google analytics
-google_analytics_id      :  # get google_analytics_id from https://analytics.google.com/analytics/
+google_analytics_id      : "UA-181014314-1" # get google_analytics_id from https://analytics.google.com/analytics/
 
 # SEO Related
-google_site_verification :  # get google_site_verification from https://search.google.com/search-console/about
+google_site_verification :  "google-site-verification=MptRfAfIhA6nBsMNUX_ITKNsZMNsUEkXnx71kD74tqM" # get google_site_verification from https://search.google.com/search-console/about
 bing_site_verification   :  # get bing_site_verification from https://www.bing.com/webmasters/about
 baidu_site_verification  :  # get baidu_site_verification from https://ziyuan.baidu.com/login/index?u=/site/index
-
+# <meta name="google-site-verification" content="MptRfAfIhA6nBsMNUX_ITKNsZMNsUEkXnx71kD74tqM" />
 # Site Author
 author:
-  name             : "Lorem ipsum"
-  avatar           : "images/android-chrome-512x512.png"
-  bio              : "Lorem ipsum College"
-  location         : "Beijing, China"
-  employer         :
+  name             : "Xiaotian (Max) Han"
+  avatar           : "images/xt.png"
+  bio              : "Assistant Professor<br>Case Western Reserve University"
+  location         : "Cleveland, OH"
+  employer         : 
   pubmed           : 
-  googlescholar    : "https://scholar.google.com/citations?user=YOUR_GOOGLE_SCHOLAR_ID"
-  email            : "Lorem@ipsum.com"
-  researchgate     :  # e.g., "https://www.researchgate.net/profile/yourprofile"
+  googlescholar    : "https://scholar.google.com/citations?user=Uromx98AAAAJ"
+  email            : # "han@tamu.edu"
+  researchgate     : 
   uri              :
   bitbucket        :
   codepen          :
@@ -37,13 +38,13 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           : # e.g., "github username"
+  github           : ahxt
   google_plus      :
   keybase          :
   instagram        :
   impactstory      : # e.g., "https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm           :
-  linkedin         : # e.g., "linkedin username"
+  linkedin         : "xiaotian-max-han-759a3358"
   dblp             : # e.g., "https://dblp.org/pid/xx/xxxx.html"
   orcid            : # e.g., "https://orcid.org/xxxx"
   pinterest        :
@@ -51,12 +52,13 @@ author:
   stackoverflow    : # http://stackoverflow.com/users/123456/username
   steam            :
   tumblr           :
-  twitter          : 
+  twitter          : XiaotianHan1
   vine             :
   weibo            :
   xing             :
   youtube          :
   wikipedia        :
+  bluesky          : xhan2.bsky.social
 
 
 # Reading Files
@@ -136,7 +138,7 @@ sass:
 
 # Outputting
 permalink: /:categories/:title/
-timezone: Asia/Shanghai # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: America/Chicago # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins
