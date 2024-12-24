@@ -1,0 +1,36 @@
+<!-- Copyright 2021 Xuning Yang
+some code to scrape through the page and find images, then puts it in a nice gallery with thumbnails-->
+
+<!-- TODO: move to sidebar if possible -->
+
+<div class="scrape-gallery">
+
+<!-- first add featured image, if any -->
+{% if page.image %}
+    <div class="gallery-thumbnail-div">
+      <!-- if else statements depending if a caption is given -->
+      {% if page.image-caption %} <a href="/{{ page.image }}" caption= "{{ page.image-caption }}" > {% endif %}
+      {% unless page.image-caption %} <a href="/{{ page.image }}" > {% endunless %}
+        <img class="gallery-thumbnail" src="/{{ page.image }}" />
+      </a>
+    </div>
+{% endif %}
+
+<!-- then scrape the rest of the post for images -->
+{% assign images = page.content | split:"{% include image.html" %}
+{% for image in images %}
+  {% if image contains 'url' %}
+      <!-- extract the URL and the DESCRIPTION fields for lightbox -->
+      {% assign imgdata = image | split:"description=" %}
+      {% assign src = imgdata[0] | split: "url=" | last %}
+      {% assign caption = imgdata[1] | split: "width = " | first %}
+      <div class="gallery-thumbnail-div">
+        <a href={{ src }} caption={{ caption }} >
+        <img class="gallery-thumbnail" src={{ src }} />
+        </a>
+      </div>
+  {% endif %}
+{% endfor %}
+
+
+</div>

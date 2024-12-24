@@ -1,0 +1,22 @@
+<!-- begin post -->
+<div class="card-group">
+    <div class="card ">
+        <div class="maxthumb">
+            <a href="{{ site.baseurl }}{{ post.url }}">
+                {% if post.image %}
+
+                    <img class="img-fluid" src="{% if post.image contains "://" %}{{ post.image }}{% else %}{{ site.baseurl }}/{{ post.image }}{% endif %}" alt="{{ post.title }}">
+
+                {% endif %}
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title-small">
+                <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+            </h2>
+            <!-- {% if post.snippet %} -->
+              <!-- <h4 class="card-text">{{ post.snippet }}</h4> -->
+            <!-- {% endif %} -->
+        </div>
+    </div>
+</div>
