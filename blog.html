@@ -1,0 +1,46 @@
+---
+layout: default
+---
+
+<br>
+<div style="text-align:left;margin-bottom:15px">Hope these will be as helpful to you today as they will be for future me.
+</div>
+<div style="text-align:left;margin-bottom:15px">
+    <a href="{{ site.baseurl }}/tags">view by tags</a>: &nbsp&nbsp
+    {% for tag in site.tags %}
+        <a href="{{ site.baseurl }}/tags/#{{ tag[0] }}">{{ tag[0] }} ({{ tag[1].size }})</a>&nbsp&nbsp&nbsp&nbsp
+    {% endfor %}
+</div>
+<hr>
+
+
+{% for post in site.posts %}
+  {% if post.category == "blog" %}
+      <a href="{{site.baseurl}}{{ post.url }}" class="post-title">
+          {{ post.title }}
+      </a>
+      <div class="post-details">
+          {{ post.date | date: "%m/%d/%Y" }}
+          <br>
+          {% for tag in post.tags %}
+              {% if post.tags.first == tag %}
+                  [
+              {% endif %}
+              <a href="{{ site.baseurl }}/tags/#{{ tag }}">{{ tag }}</a>
+              {% if post.tags.last == tag %}
+                  ]
+              {% else %}
+                  ,
+              {% endif %}
+          {% endfor %}
+      </div>
+      <br>
+      <div class="post-snippet">
+          {{ post.snippet }}
+      </div>
+      <br>
+      {% if forloop.last == false %}
+          <hr>
+      {% endif %}
+  {% endif %}
+{% endfor %}
