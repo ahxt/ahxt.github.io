@@ -1,0 +1,66 @@
+title: Xiaotian Han
+author: Xiaotian Han
+
+google_analytics: UA-181014314-1
+# Search Engine Optimization (SEO)
+keywords: xiaotian han, han xiaotian, xiaotianhan, hanxiaotian, xiaotian, case western reserve university
+canonical: https://ahxt.github.io
+description: Xiaotian Han is an assistant professor in the Department of Computer and Data Sciences at Case Western Reserve University start form Fall 2024. Previously, He obtained my CS Ph.D. at Texas A&M University. His research interests lie in the general area of artifiicial intelligence, machine learning and data science, and recently Large Language Models (LLM).
+
+
+url: "https://ahxt.github.io"
+baseurl:
+
+footer_url:
+footer_text: "Copyright © 2025 Xiaotian Han; last updated on 01/22/2025"
+
+profile-picture: assets/xt.png
+favicon_location: assets/favicon.ico
+
+permalink: /:categories/:year-:month-:day-:title/
+sass:
+    style: compressed
+
+navbar:
+ - name: "home"
+   link: "/"
+ - name: "teaching"
+   link: "/teaching"
+ - name: "group"
+   link: "/group"
+ - name: "blog"
+   link: "/blog"
+
+markdown: kramdown
+kramdown:
+  math_engine: katex
+  input: GFM
+  toc_levels: 2..4
+  # syntax_highlighter: coderay
+  # syntax_highlighter_opts:
+  #   line_numbers: 
+  #   bold_every: 5
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    default_lang: python
+    css_class : 'monokai' # github, monokai, monokai_sublime, molokai, vs, xcode, zenburn
+    
+  hard_wrap: false
+  auto_ids: true
+
+
+
+include:
+  - _pages
+
+
+plugins:
+  - jekyll-numbered-headings
+  - jekyll-sitemap
+  - kramdown-math-katex
+  
+
+
+
+
+

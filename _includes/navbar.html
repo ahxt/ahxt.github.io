@@ -1,0 +1,31 @@
+<!-- <div class="fixed-topbar"> -->
+<div class="navbar container">
+      <a id="site-title" class="alignable pull-left"href="{{ site.url }}">{{ site.title }}</a>
+      <br/>
+      <!-- <p id="site-subtitle" class="alignable pull-left" >
+        <a href="" title="Click to hear audio!"><img id="loudspeaker" src="/assets/loudspeaker-green.png" height="10" width="12"  onClick="document.getElementById('pronounciation').play(); return false;"></a>
+        Shiao-tien Han
+      </p> -->
+      <p id="site-subtitle" class="alignable pull-left" >
+        <img id="loudspeaker" src="/assets/loudspeaker-blue.svg" height="11" width="11">
+        Max Han
+      </p>
+    <ul id="navlist" class="alignable pull-right navbar-ul">
+        {% for x in site.navbar %}
+        <!-- {% assign current_link = x.link | append: '/' | replace: '//', '/'  %}
+        {% assign current_url = page.url| append: '/' | replace: '//', '/'  %} -->
+        {% assign current_url = page.url | downcase | strip %}
+        {% assign current_link = x.link | downcase | strip %}
+        <li class="alignable pull-left navbar-list {% if current_link == current_url or (current_url contains current_link and x.link != '/')  %}active{% endif %}">
+              <a href="{{ x.link }}">{{ x.name }}</a>
+              <!-- page.url = {{ page.url }}, x.link = {{ x.link }}, current_url = {{ current_url }} current_link = {{ current_link }} -->
+          <!-- {% if forloop.last == false %} {% endif %} -->
+        </li>
+        {% endfor %}
+    </ul>
+
+</div>
+<div style="clear:both"></div>
+
+<hr>
+<!-- </div> -->

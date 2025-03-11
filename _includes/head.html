@@ -1,0 +1,63 @@
+<head>
+    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="blog, {{ site.author }}, {{ site.title }}, {{ site.keywords }}">
+    <meta name="author" content="{{ site.author }}">
+    {% if page.url == "/404.html" %}
+        <meta http-equiv="refresh" content="5; url=/">
+    {% endif %}
+    {% if page.snippet %}
+        {% assign desc = page.snippet %}
+    {% else %}
+        {% assign desc = site.description %}
+    {% endif %}
+    {% if page.title %}
+        {% assign title = page.title %}
+    {% else %}
+        {% assign title = site.title %}
+    {% endif %}
+
+    <meta name="description" content="{{ desc }}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,300italic" rel="stylesheet" type="text/css" />
+    <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/github.css">
+    <!-- <link rel="stylesheet" href="{{ site.baseurl }}/css/pastie.css"> -->
+    <!-- <link rel="stylesheet" href="{{ site.baseurl }}/css/monokai.css"> -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/main.css">
+
+    <link rel="icon" type="image/ico" href="{{site.url}}{{ site.baseurl }}/{{site.favicon_location}}">
+    <link rel="shortcut-icon" type="image/ico" href="{{site.url}}{{ site.baseurl }}/{{site.favicon_location}}">
+
+    <!-- For Facebook -->
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:image" content="{{site.url}}{{ site.baseurl }}/{{site.favicon_location}}" />
+    <meta property="og:description" content="{{ desc }}" />
+
+    <!-- For Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="{{ title }}" />
+    <meta name="twitter:description" content="{{ desc }}" />
+    <meta name="twitter:image" content="{{site.url}}{{ site.baseurl }}/{{site.favicon_location}}" />
+
+    <!-- GA -->
+    {% if site.google_analytics and jekyll.environment == 'production' %}
+    {% include analytics.html %}
+    {% endif %}
+
+    <!-- KaTeX -->
+    {% if page.katex %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.18/dist/katex.min.css" integrity="sha384-veTAhWILPOotXm+kbR5uY7dRamYLJf58I7P+hJhjeuc7hsMAkJHTsPahAl0hBST0" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.18/dist/katex.min.js" integrity="sha384-v6mkHYHfY/4BWq54f7lQAdtIsoZZIByznQ3ZqN38OL4KCsrxo31SLlPiak7cj/Mg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.18/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    {% endif %}
+
+    <div class="footer" hidden="hidden">
+        <div class="center">
+            <a><img src="//clustrmaps.com/map_v2.png?cl=ffffff&w=a&t=m&d=91g_Uih-7fadH9madF_Vex1LQXOVlduL5aeBBSKXgXA&co=2d78ad&ct=ffffff" /></a>
+        </div>
+    </div>
+
+</head>
