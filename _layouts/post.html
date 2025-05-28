@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<div class="page-title">
+    {{page.title}}
+</div>
+
+<div class="page-subtitle">
+    <!-- {{ page.date | date_to_string: "ordinal", "US"  }} -->
+    <!-- <ul> -->
+        <li>{{ page.date | date: "%m/%d/%Y"  }} </li>
+        <li>{{ page.author }}</li>
+    <!-- </ul>    -->
+</div>
+<br>
+{{content}}
+
+

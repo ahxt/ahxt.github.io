@@ -1,0 +1,24 @@
+---
+layout: default
+---
+<!-- this stuff will appear after the title, which is fixed. -->
+<div class="page-subtitle">
+    <!-- {{ page.date | date_to_long_string }} -->
+    {% if page.coauthors %}
+    Designed and built in collaboration with: {{ page.coauthors }}
+    {% endif %}
+</div>
+<br>
+<!-- display feature image upfront -->
+{% if page.image %}
+<div class="opening-image">
+  <img class="img-post" src="/{{ page.image }}">
+</div>
+{% endif %}
+
+<!-- TODO: move gallery to the right -->
+
+<!-- add body content -->
+<div class="build">
+{{content}}
+</div>

@@ -1,0 +1,10 @@
+<!-- use case:
+include image.html url="/images/my-cat.jpg" description="My cat, Robert Downey Jr." width = "50%" hide="true"
+-->
+<!-- Xuning: hide is used to hide content from mainbody but show up in the gallery. Exclude if not using -->
+{% unless include.hide %}
+<figure class="image" >
+  <img src="{{ include.url }}" alt="{{ include.description }}" style="width: {{ include.width }};">
+  <figcaption class="caption">{{ include.description }}</figcaption>
+</figure>
+{% endunless %}
