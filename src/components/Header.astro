@@ -1,0 +1,192 @@
+---
+// Header component with navigation and automatic SEO optimization
+
+// Automatically determine page type and content based on URL
+const currentPath = Astro.url.pathname;
+const baseUrl = import.meta.env.BASE_URL;
+
+// Normalize paths for comparison
+const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath.slice(0, -1) : currentPath;
+const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+
+const isHomePage = normalizedCurrentPath === normalizedBaseUrl || normalizedCurrentPath === '' || currentPath === '/';
+const isBlogIndexPage = normalizedCurrentPath === `${normalizedBaseUrl}/blog` || currentPath.endsWith('/blog');
+const isBlogPost = currentPath.includes('/blog') && !isBlogIndexPage; // Any URL with /blog/ that's not the blog index
+const isAnyBlogPage = currentPath.includes('blog'); // Blog index OR any blog post
+
+// Auto-generated SEO content based on page
+let title: string;
+let description: string;
+let type: 'website' | 'article' = 'website';
+let tags: string[];
+
+if (isHomePage) {
+  title = "Xiaotian Han - Computer Science Professor | Machine Learning & LLM Research";
+  description = "Assistant Professor of Computer Science at Case Western Reserve University. Research focuses on machine learning and large language models (LLMs). PhD from Texas A&M University.";
+  tags = ["machine learning", "large language models", "computer science", "academic research", "LLM", "artificial intelligence", "professor"];
+} else if (isBlogIndexPage) {
+  title = "Blog - Xiaotian Han | Machine Learning & LLM Research Insights";
+  description = "Academic blog by Xiaotian Han, Assistant Professor of Computer Science at Case Western Reserve University. Insights on machine learning, large language models, and AI research.";
+  tags = ["academic blog", "machine learning", "large language models", "computer science", "research", "LLM", "artificial intelligence"];
+} else if (isBlogPost) {
+  title = "Research Article - Xiaotian Han | Academic Insights";
+  description = "Academic research article by Xiaotian Han on machine learning and large language models.";
+  type = 'article';
+  tags = ["research article", "machine learning", "large language models", "academic research", "LLM"];
+} else {
+  title = "Xiaotian Han - Academic Homepage";
+  description = "Academic homepage of Xiaotian Han, Assistant Professor of Computer Science specializing in machine learning and LLMs.";
+  tags = ["academic", "computer science", "machine learning", "research"];
+}
+
+const image = `${Astro.site}${import.meta.env.BASE_URL}xt.png`;
+const imageAlt = "Xiaotian Han - Profile Photo";
+const authors = ["Xiaotian Han"];
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+
+// Structured data for academic profile
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": type === 'article' ? "Article" : "Person",
+  "name": "Xiaotian Han",
+  "headline": type === 'article' ? title : undefined,
+  "jobTitle": "Assistant Professor of Computer Science",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Case Western Reserve University",
+    "url": "https://case.edu"
+  },
+  "alumniOf": {
+    "@type": "Organization",
+    "name": "Texas A&M University"
+  },
+  "knowsAbout": [
+    "Machine Learning",
+    "Large Language Models",
+    "Computer Science",
+    "Artificial Intelligence",
+    "LLMs"
+  ],
+  "url": canonicalURL,
+  "image": image,
+  "sameAs": [
+    "https://scholar.google.com/citations?hl=en&user=Uromx98AAAAJ&view_op=list_works&sortby=pubdate",
+    "https://x.com/XiaotianHan1",
+    "https://bsky.app/profile/xhan2.bsky.social",
+    "https://github.com/ahxt"
+  ],
+  "email": "xhan@case.edu",
+  ...(type === 'article' && {
+    "author": {
+      "@type": "Person",
+      "name": "Xiaotian Han"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Xiaotian Han"
+    },
+    "datePublished": new Date().toISOString(),
+    "dateModified": new Date().toISOString(),
+    "description": description
+  })
+};
+
+// Add blog-specific structured data for blog page
+const blogStructuredData = isBlogIndexPage ? {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Xiaotian Han's Academic Blog",
+  "description": description,
+  "url": canonicalURL,
+  "author": {
+    "@type": "Person",
+    "name": "Xiaotian Han",
+    "jobTitle": "Assistant Professor of Computer Science",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Case Western Reserve University"
+    }
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Xiaotian Han"
+  },
+  "inLanguage": "en-US"
+} : null;
+---
+
+<!-- SEO Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="keywords" content={tags.join(", ")} />
+<meta name="author" content={authors.join(", ")} />
+<meta name="robots" content="index, follow" />
+<meta name="language" content="en" />
+<meta name="revisit-after" content="7 days" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={image} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:site_name" content="Xiaotian Han - Academic Homepage" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={image} />
+<meta property="twitter:image:alt" content={imageAlt} />
+<meta property="twitter:creator" content="@XiaotianHan1" />
+
+<!-- Additional Meta Tags for Academic Site -->
+<meta name="theme-color" content="#1e40af" />
+<meta name="msapplication-TileColor" content="#1e40af" />
+
+<!-- Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+{blogStructuredData && (
+  <script type="application/ld+json" set:html={JSON.stringify(blogStructuredData)} />
+)}
+
+<!-- Preconnect to external domains for performance -->
+<link rel="preconnect" href="https://scholar.google.com" />
+<link rel="preconnect" href="https://github.com" />
+<link rel="dns-prefetch" href="https://x.com" />
+<link rel="dns-prefetch" href="https://bsky.app" />
+
+<header>
+  <nav>
+    <div class="logo-container">
+      <h2 class="logo">
+        <a href={import.meta.env.BASE_URL} class="logo-link">
+          <span class="logo-text">Xiaotian Han</span>
+        </a>
+      </h2>
+    </div>
+    <div class="internal-links">
+      <a href={import.meta.env.BASE_URL} class={`nav-link ${isHomePage ? 'active' : ''}`}>
+        <span class="nav-text">About</span>
+        <div class="nav-indicator"></div>
+      </a>
+      <a href={`${import.meta.env.BASE_URL}blog`} class={`nav-link ${isAnyBlogPage ? 'active' : ''}`}>
+        <span class="nav-text">Blog</span>
+        <div class="nav-indicator"></div>
+      </a>
+    </div>
+  </nav>
+</header> 
+
+<div class="footer" hidden="hidden">
+  <div class="center">
+      <a><img src="//clustrmaps.com/map_v2.png?cl=ffffff&w=a&t=m&d=91g_Uih-7fadH9madF_Vex1LQXOVlduL5aeBBSKXgXA&co=2d78ad&ct=ffffff" /></a>
+  </div>
+</div>

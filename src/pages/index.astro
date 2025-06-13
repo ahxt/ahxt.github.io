@@ -1,16 +1,52 @@
 ---
-
+// @ts-ignore
+import AboutContent from "../../content/about.typ?html&body";
+// @ts-ignore
+import CVContent from "../../content/cv.typ?html&body";
+// @ts-ignore
+import NewsContent from "../../content/news.typ?html&body";
+import Header from "../components/Header.astro";
+import "../styles/main.css";
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.ico`} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		
+		<Header />
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<main>
+			<section aria-label="About Xiaotian Han" class="about-section">
+				<div class="about-container">
+				  <div class="about-content">
+					<AboutContent />
+				  </div>
+				  <div class="about-image">
+					<img 
+						src={`${import.meta.env.BASE_URL}xt.png`} 
+						alt="Xiaotian Han - Assistant Professor of Computer Science" 
+						class="profile-photo"
+						width="400"
+						height="400"
+						loading="eager"
+					/>
+				  </div>
+				</div>
+			</section>
+			
+			<section aria-label="News">
+				<NewsContent />
+			</section>
+
+			<hr />
+			
+			<section aria-label="CV">
+				<CVContent />
+			</section>
+		</main>
 	</body>
 </html>

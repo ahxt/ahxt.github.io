@@ -1,0 +1,82 @@
+---
+import { getCollection } from "astro:content";
+import Header from "../../components/Header.astro";
+import "../../styles/main.css";
+
+export async function getStaticPaths() {
+  const blogPosts = await getCollection("blog");
+  
+  // Import each blog post's content with the special Typst query
+  const postsWithContent = await Promise.all(
+    blogPosts.map(async (post) => {
+      try {
+        const contentModule = await import(`../../../content/blog/${post.id}.typ?html&body`);
+        return {
+          params: { slug: post.id },
+          props: { 
+            post,
+            Content: contentModule.default
+          },
+        };
+      } catch (error) {
+        console.error(`Failed to load content for ${post.id}:`, error);
+        return {
+          params: { slug: post.id },
+          props: { 
+            post,
+            Content: null
+          },
+        };
+      }
+    })
+  );
+  
+  return postsWithContent;
+}
+
+const { post, Content } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.ico`} />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{post.data.title} - Academic Homepage</title>
+
+		<link rel="stylesheet" href="https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css">
+	</head>
+	<body class="blog-post">
+		<Header />
+		<main>
+            <div>
+			<article>
+				<div class="post-header">
+					<h4>{post.data.title}</h4>
+					<div class="post-meta">
+						<div class="date">
+							{post.data.date.toLocaleDateString('en-US', {
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric'
+							})}
+						</div>
+						{post.data.author && (
+							<div class="author">by {post.data.author}</div>
+						)}
+					</div>
+				</div>
+				
+				<div class="content">
+					{Content ? <Content /> : <p>Content could not be loaded.</p>}
+				</div>
+				
+				<footer>
+					<a href={`${import.meta.env.BASE_URL}blog`} class="back-link">← Back to Blog</a>
+				</footer>
+			</article>
+        </div>
+		</main>
+	</body>
+</html> 
