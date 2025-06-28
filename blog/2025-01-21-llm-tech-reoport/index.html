@@ -1,0 +1,670 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.ico"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.10.1"><title>LLM Tech Report - Academic Homepage</title><link rel="stylesheet" href="https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css"><link rel="stylesheet" href="/_astro/blog.CJoC8E46.css"></head> <body class="blog-post"> <!-- SEO Meta Tags --><title>Research Article - Xiaotian Han | Academic Insights</title><meta name="title" content="Research Article - Xiaotian Han | Academic Insights"><meta name="description" content="Academic research article by Xiaotian Han on machine learning and large language models."><meta name="keywords" content="research article, machine learning, large language models, academic research, LLM"><meta name="author" content="Xiaotian Han"><meta name="robots" content="index, follow"><meta name="language" content="en"><meta name="revisit-after" content="7 days"><!-- Canonical URL --><link rel="canonical" href="https://ahxt.github.io/blog/2025-01-21-llm-tech-reoport/"><!-- Open Graph / Facebook --><meta property="og:type" content="article"><meta property="og:url" content="https://ahxt.github.io/blog/2025-01-21-llm-tech-reoport/"><meta property="og:title" content="Research Article - Xiaotian Han | Academic Insights"><meta property="og:description" content="Academic research article by Xiaotian Han on machine learning and large language models."><meta property="og:image" content="https://ahxt.github.io//xt.png"><meta property="og:image:alt" content="Xiaotian Han - Profile Photo"><meta property="og:site_name" content="Xiaotian Han - Academic Homepage"><meta property="og:locale" content="en_US"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://ahxt.github.io/blog/2025-01-21-llm-tech-reoport/"><meta property="twitter:title" content="Research Article - Xiaotian Han | Academic Insights"><meta property="twitter:description" content="Academic research article by Xiaotian Han on machine learning and large language models."><meta property="twitter:image" content="https://ahxt.github.io//xt.png"><meta property="twitter:image:alt" content="Xiaotian Han - Profile Photo"><meta property="twitter:creator" content="@XiaotianHan1"><!-- Additional Meta Tags for Academic Site --><meta name="theme-color" content="#1e40af"><meta name="msapplication-TileColor" content="#1e40af"><!-- Structured Data --><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","name":"Xiaotian Han","headline":"Research Article - Xiaotian Han | Academic Insights","jobTitle":"Assistant Professor of Computer Science","worksFor":{"@type":"Organization","name":"Case Western Reserve University","url":"https://case.edu"},"alumniOf":{"@type":"Organization","name":"Texas A&M University"},"knowsAbout":["Machine Learning","Large Language Models","Computer Science","Artificial Intelligence","LLMs"],"url":"https://ahxt.github.io/blog/2025-01-21-llm-tech-reoport/","image":"https://ahxt.github.io//xt.png","sameAs":["https://scholar.google.com/citations?hl=en&user=Uromx98AAAAJ&view_op=list_works&sortby=pubdate","https://x.com/XiaotianHan1","https://bsky.app/profile/xhan2.bsky.social","https://github.com/ahxt"],"author":{"@type":"Person","name":"Xiaotian Han"},"publisher":{"@type":"Person","name":"Xiaotian Han"},"datePublished":"2025-06-28T03:59:49.021Z","dateModified":"2025-06-28T03:59:49.021Z","description":"Academic research article by Xiaotian Han on machine learning and large language models."}</script><!-- Preconnect to external domains for performance --><link rel="preconnect" href="https://scholar.google.com"><link rel="preconnect" href="https://github.com"><link rel="dns-prefetch" href="https://x.com"><link rel="dns-prefetch" href="https://bsky.app"><header> <nav> <div class="logo-container"> <h2 class="logo"> <a href="/" class="logo-link"> <span class="logo-text">Xiaotian Han</span> </a> </h2> </div> <div class="internal-links"> <a href="/" class="nav-link "> <span class="nav-text">About</span> <div class="nav-indicator"></div> </a> <a href="/blog" class="nav-link active"> <span class="nav-text">Blog</span> <div class="nav-indicator"></div> </a> </div> </nav> </header> <div class="footer" hidden="hidden"> <div class="center"> <a><img src="//clustrmaps.com/map_v2.png?cl=ffffff&w=a&t=m&d=91g_Uih-7fadH9madF_Vex1LQXOVlduL5aeBBSKXgXA&co=2d78ad&ct=ffffff"></a> </div> </div> <main> <div> <article> <div class="post-header"> <h4>LLM Tech Report</h4> <div class="post-meta"> <div class="date"> June 7, 2025 </div> <div class="author">by Xiaotian Han</div> </div> </div> <div class="content"> <div>
+  <div>1.Ring-lite (06/18/2025)</div>
+  <div>2.Gemini 2.5 (06/17/2025)</div>
+  <div>3.AceReason-Nemotron 1.1 (06/18/2025)</div>
+  <div>4.MiniMax-M1 (06/16/2025)</div>
+  <div>5.Magistral (06/12/2025)</div>
+  <div>6.dots.llm1 (06/06/2025)</div>
+  <div>7.Qwen3 Embedding (06/05/2025)</div>
+  <div>8.OpenThoughts (06/05/2025)</div>
+  <div>9.MiMo-VL (06/04/2025)</div>
+  <div>10.Qwen 3 (05/14/2025)</div>
+  <div>11.Llama-Nemotron (05/14/2025)</div>
+  <div>12.MiMo (05/12/2025)</div>
+  <div>13.Seed 1.5-VL (05/11/2025)</div>
+  <div>14.Phi-4-reasoning (04/30/2025)</div>
+  <div>15.Seed 1.5-thinking (04/29/2025)</div>
+  <div>16.Kimi-Audio (04/25/2025)</div>
+  <div>17.Trillion 7B (04/21/2025)</div>
+  <div>18.Seedream 3.0 (04/16/2025)</div>
+  <div>19.Kimi-VL (04/15/2025)</div>
+  <div>20.Tulu 3 (04/14/2025)</div>
+  <div>21.Qwen2.5-Omni (03/26/2025)</div>
+  <div>22.Gemma 3 (03/25/2025)</div>
+  <div>23.Phi-4-Mini (03/07/2025)</div>
+  <div>24.Qwen2.5-VL (02/19/2025)</div>
+  <div>25.Janus-Pro (01/29/2025)</div>
+  <div>26.DeepSeek-R1 (01/20/2025)</div>
+  <div>27.Kimi K1.5 (01/20/2025)</div>
+  <div>28.MiniMax-01 (01/15/2025)</div>
+  <div>29.Qwen2.5-Math-PRM (01/13/2025)</div>
+  <div>30.OLMo 2 (12/31/2024)</div>
+  <div>31.Deepseek-V3 (12/16/2024)</div>
+  <div>32.Qwen2.5 (12/19/2024)</div>
+  <div>33.Phi-4 (12/12/2024)</div>
+  <div>34.TÜLU 3 (12/06/2024)</div>
+  <div>35.Llama 3 (08/15/2024)</div>
+  <div>36.OLMo (07/07/2024)</div>
+  <h2>1. Ring-lite (06/18/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.14165">pdf</a>, <a href="https://huggingface.co/inclusionAI/Ring-lite">huggingface</a></li>
+    <li>Based on Ling-lite, a 16.8B parameter model with 2.75B activated parameters</li>
+    <li>Math (64.5%), Code (25.5%), and Science (9.2%, encompassing some high-quality and difficult samples generated by SHARP</li>
+    <li>C3PO: Constrained Contextual Computation Policy Optimization</li>
+  </ul>
+  <h2>2. Gemini 2.5 (06/17/2025)</h2>
+  <ul>
+    <li><a href="https://storage.googleapis.com/deepmind-media/gemini/gemini_v2_5_report.pdf">pdf</a></li>
+    <li>sparse mixture-of-experts (MoE)</li>
+    <li>post-training: SFT, Reward Modeling (RM), RL stages</li>
+    <li>have increased the training compute allocated to RL</li>
+    <li>coupled with a focus on verifiable rewards and model-based generative rewards</li>
+  </ul>
+  <h2>3. AceReason-Nemotron 1.1 (06/18/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.13284">pdf</a>, <a href="https://huggingface.co/nvidia/AceReason-Nemotron-1.1-7B">huggingface</a></li>
+    <li>Scaling of SFT data consistently improves performance</li>
+    <li>Performance improves progressively over epochs</li>
+    <li>Math-only RL significantly improves code reasoning</li>
+    <li>increasing the number of responses for each prompt serves as a practical alternative to boost the performance of SFT model.</li>
+  </ul>
+  <h2>4. MiniMax-M1 (06/16/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2506.13585">pdf</a>, <a href="https://huggingface.co/collections/MiniMaxAI/minimax-m1-68502ad9634ec0eeac8cf094">huggingface</a></p>
+    </li>
+    <li>
+      <p>456B parameters with 45.9N parameters activated</p>
+    </li>
+    <li>
+      <p>context length of 1 million tokens</p>
+    </li>
+    <li>
+      <p>CISPO (Clipped IS-weight Policy Optimization)</p>
+      <ul>
+        <li>basically it is policy gradient with probabilities ratio clipping.</li>
+        <li>without weight clipping, CISPO reduces to the standard policy gradient objective</li>
+        <li>impose a lower bound on the IS weight by setting εIS low to a large value</li>
+        <li>dynamic sampling and length penalty techniques</li>
+        <li>no KL penalty term</li>
+        <li>on Qwen2.5-32B-base, CISPO significantly outperforms both DAPO and GRPO with the same number of training steps</li>
+      </ul>
+    </li>
+  </ul>
+  <h2>5. Magistral (06/12/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.10910">pdf</a>, <a href="https://huggingface.co/mistralai/Magistral-Small-2506">https://huggingface.co/mistralai/Magistral-Small-2506</a></li>
+    <li>Magistral Small (24B, release) and Magistral Medium, based on the Mistral Small 3 and Mistral Medium 3 models</li>
+    <li>
+      <p>adapting GRPO:</p>
+      <ul>
+        <li>eliminate KL divergence</li>
+        <li>normalize the loss by first adding token-wise loss</li>
+        <li>normalize the advantages in each minibatch</li>
+        <li>relax the trust region's upper bound</li>
+        <li>filter out all groups with zero advantage</li>
+      </ul>
+    </li>
+    <li>
+      <p>reward shaping:</p>
+      <ul>
+        <li>formatting:</li>
+        <li>correctness</li>
+        <li>length: soft length penalty to signal the model that the hard cutoff on maximal completion length is near</li>
+        <li>language consistency: If the classifier indicates that all three parts used the same language, we give an additional reward of 0.1</li>
+      </ul>
+    </li>
+    <li>
+      <p>infrastructure:</p>
+      <ul>
+        <li>1) Generators continuously output completions to prompts from input data sources.</li>
+        <li>2) Whenever a completion is finished, it is sent to the appropriate verifier.</li>
+        <li>3) Each sequence is sent to a different data parallel group using a pre-set permutation until every data parallel group has enough sequences to form a batch.</li>
+        <li>4) A single gradient step is performed and the trainer and generators are updated.</li>
+      </ul>
+    </li>
+  </ul>
+  <h2>6. dots.llm1 (06/06/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.05767">pdf</a>, <a href="https://huggingface.co/rednote-hilab/dots.llm1.inst">huggingface</a></li>
+    <li>MoE that activates 14 billion parameters out of 142 billion parameters</li>
+    <li>pretrained on 11.2T high-quality tokens</li>
+    <li>adopt a sparse DeepSeekMoE framework</li>
+    <li>classic MHA combined with QK-Norm</li>
+    <li>auxiliary-loss-free strategy, which introduces a bias term for each expert, added to the corresponding affinity scores to determine the top-k routing</li>
+    <li>post-training: SFT using 400K instances</li>
+    <li>1F1B based all-to-all communication and computation overlap solution</li>
+  </ul>
+  <h2>7. Qwen3 Embedding (06/05/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>8. OpenThoughts (06/05/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.04178v2">pdf</a>, <a href="https://huggingface.co/open-thoughts/OpenThinker3-7B">huggingface</a></li>
+    <li>We use OpenMath-2-Math as our sole math question source, CodeGolf and OpenCodeReasoning as our code question sources, and StackExchangePhysics and OrganicChemistryPDFs as our science question sources.</li>
+    <li>We use difficulty-based filtering with GPT-4o-mini for code questions, and response length filtering with GPT-4.1-mini for math and science questions.</li>
+    <li>Our final pipeline uses 16× answers per question for all domains. It uses exact deduplication for math and science and no deduplication for code.</li>
+    <li>We do not perform answer filtering because no filtering strategy outperformed the baseline, which uses all the answers.</li>
+    <li>Across all domains, using QwQ-32B as a teacher model outperforms all other teacher models, yielding an average accuracy improvement of 1.9% and 2.6% over using DeepSeek-R1 as a teacher for code and math</li>
+    <li>OpenThinker3-7B is the best open-data reasoning model at the 7B scale, regardless of optimization algorithm choice (SFT, RL, or both)</li>
+  </ul>
+  <h2>9. MiMo-VL (06/04/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2506.03569v1">pdf</a>, <a href="https://huggingface.co/collections/XiaomiMiMo/mimo-vl-68382ccacc7c2875500cd212">huggingface</a></li>
+    <li>
+      <p>A four-stage pre-training phase</p>
+      <ul>
+        <li>1) projector warmup: freeze the ViT and LLM, Image-Caption Pairs</li>
+        <li>2) vision-language alignment: ViT is then unfrozen, + Interleaved Data</li>
+        <li>3) general multimodal pre-training: all parameters are trainable</li>
+        <li>4)long-context SFT</li>
+      </ul>
+    </li>
+    <li>three components: 1) a ViT encoder, 2) a MLP projector (3) MiMo-7B-Base</li>
+    <li>
+      <p>RLVF</p>
+      <ul>
+        <li>verifiable STEM questions from open-source communities and proprietary K-12 collections</li>
+        <li>bounding box predictions</li>
+      </ul>
+    </li>
+    <li>GRPO: single-step policy updates following response rollout, eliminating the need for a clipped surrogate training objective</li>
+  </ul>
+  <h2>10. Qwen 3 (05/14/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2505.09388v1">pdf</a>, <a href="https://huggingface.co/collections/Qwen/qwen3-67dd247413f0e2e4f653967f">huggingface</a></li>
+    <li>6 dense models Qwen3-0.6B, Qwen3-1.7B, Qwen3-4B, Qwen3-8B, Qwen3-14B, and Qwen3-32B</li>
+    <li>2 MoE models, Qwen3-30B-A3B and Qwen3-235B-A22B</li>
+    <li>Qwen3-235B-A22B, has a total of 235B parameters with 22B activated ones</li>
+    <li>we remove QKV-bias used in Qwen2 and introduce QK-Norm to ensure stable training for Qwen3</li>
+    <li>The Qwen3 MoE models have 128 total experts with 8 activated experts per token. Qwen3-MoE design excludes shared experts</li>
+    <li>pretrain a total of 36 trillion tokens</li>
+    <li>Qwen2.5-VL, PDF-like documents, amounting to trillions in total.</li>
+    <li>employ Qwen2.5, Qwen2.5-Math, and Qwen2.5-Coder models to synthesize trillions of text tokens, including textbooks, question-answering, instructions, and code snippets, covering dozens of domains</li>
+    <li>Pre-training Stage: (S1) General Stage: 30 trillion tokens, (S2) Reasoning Stage: 5T higher-quality tokens on STEM, coding, reasoning, and synthetic data, (S3) Long Context Stage: increase the base frequency from 10,000 to 1,000,000</li>
+  </ul>
+  <h2>11. Llama-Nemotron (05/14/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2505.00949v3">pdf</a>, <a href="https://huggingface.co/collections/nvidia/llama-nemotron-67d92346030a2691293f200b">huggingface</a></li>
+    <li>
+      <p>five stage training:</p>
+      <ul>
+        <li>optimizing inference efficiency with neural architecture search (NAS) from the Llama 3</li>
+        <li>knowledge distillation and continued pretraining.</li>
+        <li>SFT on a mix of standard instruction data and reasoning traces from DeepSeek-R1</li>
+        <li>RL on complex mathematics and STEM datasets</li>
+        <li>alignment phase focused on instruction following and human preference.</li>
+      </ul>
+    </li>
+    <li>neural architecture search: Attention removal and Variable FFN dimensions</li>
+    <li>both reasoning and non-reasoning data for supervised fine-tuning</li>
+    <li>For reasoning samples, include the system instruction "detailed thinking on", and for non-reasoning samples, we use "detailed thinking off"</li>
+    <li>GRPO: use a rollout prompt size of 72 and sample 16 responses per prompt with temperature = 1 and top_p = 1. During training, we set global batch size as 576 and conduct 2 gradient updates per rollout.</li>
+    <li>Accuracy rewards: serve the Llama-3.3-70B-Instruct to judge whether the policy’s predictions match the ground truth answer</li>
+    <li>"" and "&lt;/think>" tags when using "detailed thinking on" mode and check for the non-existence of thinking tags when using "detailed thinking off" mode.</li>
+  </ul>
+  <h2>12. MiMo (05/12/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2505.07608v1">pdf</a>, <a href="https://huggingface.co/collections/XiaomiMiMo/mimo-6811688ee20ba7d0682f5cb9">huggingface</a></li>
+    <li>pre-trained on 25 trillion tokens</li>
+    <li>MultiToken Prediction objective</li>
+    <li>GQA, pre-RMSNorm, SwiGLU activation and RoPE, similar to Llama and Qwen</li>
+    <li>our final SFT dataset comprises about 500K samples</li>
+    <li>learning rate of <span><math><mrow><mn>3</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow></math></span> and batch size of 128. Samples are packed to the maximum length of 32,768 tokens during training</li>
+    <li>two categories of verifiable problems, mathematics and code</li>
+    <li>GRPO: Removal of KL Loss, Dynamic Sampling, Clip-Higher</li>
+    <li>verl</li>
+    <li>an easy data resampling strategy. maintain an easy data pool, 10% sample from this easy data pool</li>
+    <li></li>
+  </ul>
+  <h2>13. Seed 1.5-VL (05/11/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2505.07062v1">pdf</a></li>
+    <li>a 532M-parameter vision encoder and a MoE LLM of 20B active parameters</li>
+    <li></li>
+  </ul>
+  <h2>14. Phi-4-reasoning (04/30/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2504.21318">pdf</a>, <a href="https://huggingface.co/microsoft/Phi-4-reasoning">huggingface</a></p>
+    </li>
+    <li>
+      <p>14B parameters, SFT from Phi-4</p>
+    </li>
+    <li>
+      <p>highlight the benefits of careful data curation and SFT for reasoning language models</p>
+    </li>
+    <li>
+      <p>Phi-4 base model was pretrained using large innovative synthetic datasets specifically curated to prioritize reasoning and complex problem-solving</p>
+    </li>
+    <li>
+      <p>Seeds database</p>
+      <ul>
+        <li>are used in both SFT for Phi-4-reasoning and RL for Phi-4-reasoning-plus.</li>
+        <li>across STEM disciplines and coding, also incorporating general-purpose question-answer style prompts.</li>
+        <li>include alignment-focused data aimed at enhancing model safety, mitigating potential harms, and promoting responsible AI practices</li>
+      </ul>
+    </li>
+    <li>
+      <p>we found o3-mini with medium “reasoning effort” effort to have similar effect to DeepSeek-R1 when used as teachers</p>
+    </li>
+    <li>
+      <p>rewards: length-aware correctness, incompleteness, invalid “thinking” block, repetition penalty</p>
+    </li>
+    <li>
+      <p>We select as our RL checkpoint the model with the best observed AIME 2024 score, which is the model trained for 90 steps, over only ∼ 6k examples (and 8 trajectories of responses per example)</p>
+    </li>
+  </ul>
+  <h2>15. Seed 1.5-thinking (04/29/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>16. Kimi-Audio (04/25/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>17. Trillion 7B (04/21/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2504.15431v1">pdf</a>, <a href="https://huggingface.co/collections/trillionlabs/trillion-7b-preview-67dba4aebaeae23ec78b1b20">huggingface</a></li>
+    <li>For post-training, we closely follow the Tülu 3 framework consisting of SFT, DPO, and RLVR.</li>
+    <li>2T tokens, Multi-token Prediction</li>
+    <li>extend the RoPE base from 100,000 to 1,000,000 using the ABF</li>
+  </ul>
+  <h2>18. Seedream 3.0 (04/16/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>19. Kimi-VL (04/15/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>20. Tulu 3 (04/14/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2411.15124v5">pdf</a>, <a href="https://huggingface.co/collections/allenai/tulu-3-models-673b8e0dc3512e30e7dc54f5">huggingface</a></li>
+    <li>
+      <p>Stage 1: Data Curation</p>
+      <ul>
+        <li>Precise Instruction Following</li>
+        <li>Math and Coding</li>
+        <li>Noncompliance and Safety</li>
+      </ul>
+    </li>
+    <li>Stage 2: Supervised Finetuning</li>
+    <li>
+      <p>Stage 3: Preference Tuning</p>
+      <ul>
+        <li>Direct Preference Optimization</li>
+        <li>We find that length-normalized DPO works best, which uses the following objective:</li>
+      </ul>
+    </li>
+    <li>
+      <p>Stage 4: Reinforcement Learning with Verifiable Rewards</p>
+      <ul>
+        <li><span><math><mrow><munder displaystyle="false"><mi mathvariant="normal">max</mi><msub><mi>𝜋</mi><mi>𝜃</mi></msub></munder><msub><mi>𝐸</mi><mrow><mi>𝑦</mi><mo>∼</mo><msub><mi>𝜋</mi><mrow><mi>𝜃</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow></msub></mrow></msub><mrow><mo>[</mo><msub><mi>𝑅</mi><mrow><mtext>RLVR</mtext><mrow><mo>(</mo><mrow><mrow><mi>𝑥</mi><mo>,</mo></mrow><mi>𝑦</mi></mrow><mo>)</mo></mrow></mrow></msub><mo>]</mo></mrow><mo>=</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑣</mi><mrow><mo>(</mo><mrow><mrow><mi>𝑥</mi><mo>,</mo></mrow><mi>𝑦</mi></mrow><mo>)</mo></mrow></mrow></mrow><mo>−</mo><mi>𝛽</mi><mi mathvariant="normal">KL</mi><mrow><mo>[</mo><mrow><msub><mi>𝜋</mi><mrow><mi>𝜃</mi><mrow><mo>(</mo><mrow><mi>𝑦</mi><mo>|</mo><mi>𝑥</mi></mrow><mo>)</mo></mrow></mrow></msub><mo>‖</mo><msub><mi>𝜋</mi><mrow><mtext>ref</mtext><mrow><mo>(</mo><mrow><mi>𝑦</mi><mo>|</mo><mi>𝑥</mi></mrow><mo>)</mo></mrow></mrow></msub></mrow><mo>]</mo></mrow></mrow></mrow></math></span> where <span><math><mrow><mrow><mi>𝑣</mi><mrow><mo>(</mo><mrow><mrow><mi>𝑥</mi><mo>,</mo></mrow><mi>𝑦</mi></mrow><mo>)</mo></mrow></mrow><mo>=</mo><mi>𝛼</mi><mtext> if correct, 0 otherwise.</mtext></mrow></math></span> and <span><math><mrow><mi>𝛼</mi><mo>=</mo><mn>10</mn></mrow></math></span> is a hyperparameter.</li>
+        <li>RLVR Data: GSM8K, MATH, and IFEval</li>
+        <li>30,000 prompts with ground truth labels</li>
+        <li>Initialize the Value model from a General RM</li>
+        <li>Disable Dropout</li>
+        <li>Train with the SFT Dataset and Shuffle Between Epochs</li>
+        <li>Non End-of-Sequence (EOS) Penalty</li>
+        <li>Advantage Whitening / Normalization</li>
+        <li>Starting from a Weaker Model Can Converge to the Same Verifiable Rewards.</li>
+        <li>OpenRLHF</li>
+      </ul>
+    </li>
+    <li>Batch Aggregation: Early during training Tülu 3, we noticed a gap in performance between SFT models trained on our OpenInstruct framework and models trained in other settings such as on TPUs. :padding tokens without taking into account gradient accumulation or distributed training setups</li>
+  </ul>
+  <h2>21. Qwen2.5-Omni (03/26/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>22. Gemma 3 (03/25/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2503.19786v1">pdf</a>, <a href="https://huggingface.co/collections/google/gemma-3-release-67c6c6f89c4f76621268bb6d">huggingface</a></p>
+    </li>
+    <li>
+      <p>alternate between a local sliding window self-attention and global self-attention, with 5 local layers for every global layer, the first layer is local layer.</p>
+    </li>
+    <li>
+      <p>replace the soft-capping of Gemma 2 with QK-norm</p>
+    </li>
+    <li>
+      <p>increase RoPE base frequency from 10k to 1M on global self-attention layers</p>
+    </li>
+    <li>
+      <p>keep the frequency of the local layers at 10k</p>
+    </li>
+    <li>
+      <p>14T tokens for Gemma 3 27B, 12T for the 12B version, 4T for the 4B, and 2T tokens for the 1B</p>
+    </li>
+    <li>
+      <p>Distillation. We sample 256 logits per token, weighted by teacher probabilities.</p>
+    </li>
+  </ul>
+  <h2>23. Phi-4-Mini (03/07/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/2503.01743">pdf</a>, <a href="https://huggingface.co/microsoft/Phi-4-mini-instruct">huggingface</a></li>
+  </ul>
+  <h2>24. Qwen2.5-VL (02/19/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>25. Janus-Pro (01/29/2025)</h2>
+  <ul>
+    <li><a href="https://arxiv.org/pdf/">pdf</a>, <a href="https://huggingface.co/">huggingface</a></li>
+    <li>TBD</li>
+  </ul>
+  <h2>26. DeepSeek-R1 (01/20/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf">pdf</a>, <a href="https://huggingface.co/collections/deepseek-ai/deepseek-r1-678e1e131c0169c0bc89728d">huggingface</a></p>
+    </li>
+    <li>
+      <p>DeepSeek-R1-Zero: use DeepSeek-V3-Base as the base model and employ GRPO as the RL framework to improve model performance in reasoning. During training.</p>
+    </li>
+    <li>
+      <p>DeepSeek-R1:</p>
+      <ul>
+        <li><strong>(DeepSeek-V3-Base)->(DeepSeek-V3-SFT1)</strong> cold-start SFT with thousands of data from in-context long CoT prompting + DeepSeek-R1Zero readable outputs</li>
+        <li><strong>(DeepSeek-V3-SFT1)->(DeepSeek-V3-RL)</strong> reasoning-oriented RL like DeepSeek-R1-Zero.</li>
+        <li><strong>(DeepSeek-V3-Base)->(DeepSeek-V3-SFT2)</strong> two epoch fine-tuning DeepSeek-V3-Base using 600k reasoning related training samples via rejection sampling on the RL checkpoint + 200k non-reasoning training samples</li>
+        <li><strong>(DeepSeek-V3-SFT2)->(DeepSeek-R1)</strong> After fine-tuning, an additional RL process, taking into account prompts from all scenarios.</li>
+      </ul>
+    </li>
+    <li>
+      <p>Do not use ORM or PRM, use rule-based reward system: Accuracy rewards, Format rewards.</p>
+    </li>
+    <li>
+      <p>Emphasize that neural reward model may suffer from reward hacking in the large-scale reinforcement learning process</p>
+    </li>
+    <li>
+      <p>Designing a straightforward template that guides the base model to adhere to specified instructions</p>
+    </li>
+    <li>
+      <p><strong>(Interesting)</strong> DeepSeek-R1-Zero naturally acquires the ability to solve increasingly complex reasoning tasks by leveraging extended test-time computation. This improvement is not the result of external adjustments but rather an intrinsic development within the model.</p>
+    </li>
+    <li>
+      <p><strong>(Interesting)</strong> Behaviors such as reflection are not explicitly programmed but instead emerge as a result of the model's interaction with the reinforcement learning environment.</p>
+    </li>
+    <li>
+      <p><strong>Aha Moment of DeepSeek-R1-Zero</strong>: DeepSeek-R1-Zero learns to allocate more thinking time to a problem by reevaluating its initial approach.</p>
+      <ul>
+        <li>DeepSeek-R1-Zero struggles with challenges like poor readability, and language mixing.</li>
+        <li>Distillation from DeepSeek-R1 to smaller dense models works well. This demonstrates that the reasoning patterns discovered by larger base models are crucial for improving reasoning capabilities</li>
+      </ul>
+    </li>
+  </ul>
+  <h2>27. Kimi K1.5 (01/20/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://github.com/MoonshotAI/Kimi-k1.5/blob/main/Kimi_k1.5.pdf">pdf</a></p>
+    </li>
+    <li>
+      <p>Long-CoT Supervised Fine-Tuning</p>
+      <ul>
+        <li>construct a small yet high-quality long-CoT warmup dataset</li>
+      </ul>
+    </li>
+    <li>
+      <p>Reinforcement Learning</p>
+      <ul>
+        <li>For verifiable problems, the reward is predefined criteria or rules. For problems with free-form ground truth, us a reward model r(x, y, y∗).</li>
+        <li>Length Penalty to avoid overthinking phenomenon</li>
+        <li>Several approaches for this long2short problem, including model merging, shortest rejection sampling, DPO, and long2short RL.</li>
+      </ul>
+    </li>
+  </ul>
+  <h2>28. MiniMax-01 (01/15/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/abs/2501.08313">pdf</a>, <a href="https://huggingface.co/MiniMaxAI/MiniMax-Text-01">huggingface minimax-01</a></p>
+    </li>
+    <li>
+      <p>456 billion parameters, 45.9 billion activations, and 32 experts, 1.5T tokens for pre-training</p>
+    </li>
+    <li>
+      <p>good to know that the naive linear attention <span><math><mrow><mi>𝑂</mi><mo>=</mo><mrow><mtext>Norm</mtext><mrow><mo>(</mo><mrow><mi>𝑄</mi><mrow><mo>(</mo><mrow><msup><mi>𝐾</mi><mo>⊤</mo></msup><mi>𝑉</mi></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math></span> has efficiency issues due the cumulative sum operation when consider the causal mask</p>
+    </li>
+    <li>
+      <p>Need to learn the detail of Lightning Attention <a href="https://sustcsonglin.github.io/assets/pdf/talk_250117.pdf">https://sustcsonglin.github.io/assets/pdf/talk_250117.pdf</a></p>
+    </li>
+    <li>
+      <p>Transformer-style block, with each comprises a channel mixer (an attention block, lightning attention and softmax attention) and a feature mixer (an MLP block, an MoE that incorporates multiple feed-forward networks (FFNs))</p>
+    </li>
+    <li>
+      <p>hybrid architecture have yielded promising results, delve deeper into its potential through two variants: hybrid-cosformer2 and hybrid-<a href="https://arxiv.org/pdf/2404.07904">hgrn2</a>.</p>
+    </li>
+    <li>
+      <p>Almost perfect long-context understanding ability, with a context window of 1M tokens</p>
+    </li>
+  </ul>
+  <h2>29. Qwen2.5-Math-PRM (01/13/2025)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2501.07301">pdf</a>, <a href="https://hf.co/Qwen/Qwen2.5-Math-PRM-7B">huggingface</a></p>
+    </li>
+    <li>
+      <p>Commonly used Monte Carlo (MC) estimation-based data synthesis for PRMs typically yields inferior performance and generalization compared to LLM-as-a-judge and human annotation methods.</p>
+    </li>
+    <li>
+      <p>Reveal the potential bias in using response-level BoN evaluation alone for PRMs</p>
+    </li>
+    <li>
+      <p>TBD</p>
+    </li>
+  </ul>
+  <h2>30. OLMo 2 (12/31/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2501.00656">pdf</a>, <a href="https://huggingface.co/collections/allenai/olmo-2-674117b93ab84e98afc72edc">huggingface olmo-2</a></p>
+    </li>
+    <li>
+      <p>up to 5T tokens, 95% derived from web data; 7B 13B parameters</p>
+    </li>
+    <li>
+      <p>Reordered norm and QK-norm. <span><math><mrow><mi>ℎ</mi><mo>≔</mo><mi>𝑥</mi><mo>+</mo><mrow><mrow><mtext>RMSNorm</mtext><mrow><mo>(</mo><mrow><mtext>Attention</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>;</mo></mrow><msub><mi>ℎ</mi><mtext> out </mtext></msub><mo>≔</mo><mi>ℎ</mi><mo>+</mo><mrow><mtext>RMSNorm</mtext><mrow><mo>(</mo><mrow><mtext>MLP</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math></span></p>
+    </li>
+    <li>
+      <p>Data can be a cause of both gradient norm and loss spikes. When investigating training batches at which spikes occurred, we found a high prevalence of instances containing long, repeated n-gram sequences</p>
+    </li>
+    <li>
+      <p>improving training stability from OLMo 2's initialization, initialize every parameter from a normal distribution with a mean of <span><math><mn>0</mn></math></span> and a standard deviation of <span><math><mn>0.02</mn></math></span></p>
+    </li>
+    <li>
+      <p>decreasing the AdamW <span><math><mi>𝜀</mi></math></span> from <span><math><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></math></span> to <span><math><msup><mn>10</mn><mrow><mo>−</mo><mn>8</mn></mrow></msup></math></span></p>
+    </li>
+    <li>
+      <p>confirm the effectiveness of this approach, also known as model souping, on six different mid-training mixes</p>
+    </li>
+    <li>
+      <p>three phases of training: SFT, preference tuning with DPO, and RLVR</p>
+    </li>
+    <li>
+      <p>turn off weight decay for embeddings and observe that embedding norms settle in a healthy region.</p>
+    </li>
+  </ul>
+  <h2>31. Deepseek-V3 (12/16/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://github.com/deepseek-ai/DeepSeek-V3/blob/main/DeepSeek_V3.pdf">pdf</a>, <a href="https://huggingface.co/collections/deepseek-ai/deepseek-v3-676bc4546fb4876383c4208b">huggingface</a></p>
+    </li>
+    <li>
+      <p><strong>multi-token prediction objective</strong>, the acceptance rate of 2nd token prediction is 85%   90%</p>
+    </li>
+    <li>
+      <p><strong>knowledge distillation from DeepSeek-R1</strong>, notably improves its reasoning performance</p>
+    </li>
+    <li>
+      <p><strong>balanced expert loading</strong> introduce a bias term for each expert to help determine the top-K routing</p>
+    </li>
+    <li>
+      <p><strong>DualPipe</strong>: overlap the computation and communication within forward and backward chunks.</p>
+    </li>
+    <li>
+      <p><strong>fp8 quantization during training</strong>: introduce a fine-grained quantization strategy for fp8</p>
+    </li>
+    <li>
+      <p><strong>an efficient and lightweight training framework</strong>, HAI-LLM. (might be the impressive engineering basis)</p>
+    </li>
+    <li>
+      <p>numbers: 14.8T tokens for pre-training</p>
+    </li>
+    <li>
+      <p>RMSNorm recomputation during back-propagation</p>
+    </li>
+    <li>
+      <p>adopt the BF16 for first and second moments in the AdamW</p>
+    </li>
+    <li>
+      <p>do not incorporate cross-sample attention masking during training</p>
+    </li>
+    <li>
+      <p>use document packing method for data integrity</p>
+    </li>
+    <li>
+      <p>incorporate the FIM strategy in the pre-training</p>
+    </li>
+    <li>
+      <p>shared embedding and output head for multi-token prediction (due the DualPipe implementation)</p>
+    </li>
+    <li>
+      <p>not use costly tensor parallelism</p>
+    </li>
+    <li>
+      <p>suggestions on hardware design</p>
+      <ul>
+        <li>higher FP8 GEMM accumulation precision</li>
+        <li>
+          <p>tile- and block-wise quantization</p>
+          <ul>
+            <li>online quantization</li>
+            <li>transposed GEMM operations</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <h2>32. Qwen2.5 (12/19/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2412.15115">pdf</a></p>
+      <ul>
+        <li>
+          <p><a href="https://huggingface.co/collections/Qwen/qwen25-66e81a666513e518adb90d9e">huggingface</a></p>
+        </li>
+        <li>
+          <p>0.5B, 1.5B, 3B, 7B, 14B, 72B; 18T token for pre-training</p>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <p>Qwen2-72B-Instruct and Qwen2-Math-72B-Instruct generate synthetic data in mathematics, code, and knowledge domains</p>
+      <ul>
+        <li>increase RoPE base from 10,000 to 1,000,000 using the ABF technique</li>
+        <li>develop long-response datasets, capable of generating high-quality 8,192 tokens</li>
+      </ul>
+    </li>
+  </ul>
+  <h2>33. Phi-4 (12/12/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2412.08905">pdf</a></p>
+    </li>
+    <li>
+      <p>numbers: 14B, 10T tokens</p>
+    </li>
+    <li>
+      <p>50 broad types, 400B-token synthetic datasets, spanning an array of topics, skills, and natures of interaction</p>
+    </li>
+    <li>
+      <p>question-answer data contributed significantly to various capabilities, such as mathematical reasoning and academic performance</p>
+    </li>
+    <li>
+      <p>one round of SFT, one round of DPO on data from our pivotal token search method, and one round of DPO on full length preference pairs</p>
+    </li>
+    <li>
+      <p>8B tokens of data for SFT, all formatted in the chatml format</p>
+    </li>
+  </ul>
+  <h2>34. TÜLU 3 (12/06/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2411.15124">pdf</a>, <a href="https://huggingface.co/collections/allenai/tulu-3-models-673b8e0dc3512e30e7dc54f5">huggingface</a></p>
+    </li>
+    <li>
+      <p>synthetic data generation for target skills such as precise instruction following, math and coding</p>
+    </li>
+    <li>
+      <p>safety SFT data was generally orthogonal to our other datasets</p>
+    </li>
+    <li>
+      <p>changing the chat template, replacing the newlines at the end of assistant messages with an eos</p>
+    </li>
+    <li>
+      <p>SFT performance noticeably varies based on the seed</p>
+    </li>
+    <li>
+      <p>model soup does not always outperform the best single run</p>
+    </li>
+    <li>
+      <p>use length-normalized DPO for tuning our preference data mixtures and generation methods</p>
+    </li>
+    <li>
+      <p>scaling the number of unique prompts improve downstream DPO performance</p>
+    </li>
+    <li>
+      <p>for our final DPO models we decided on using a learning rate of <span><math><mrow><mn>2.0</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>7</mn></mrow></msup></mrow></math></span></p>
+    </li>
+    <li>
+      <p>introduce (RLVR), a novel method for training llm on tasks with verifiable outcomes</p>
+    </li>
+    <li>
+      <p>RLVR focus on two domains (mathematics, exact instruction following) and three evaluations (GSM8K, MATH, IFEval)</p>
+    </li>
+  </ul>
+  <h2>35. Llama 3 (08/15/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2407.21783">pdf</a>, <a href="https://huggingface.co/collections/meta-llama/llama-32-66f448ffc8c32f949b04c8cf">huggingface</a></p>
+    </li>
+    <li>
+      <p>405B parameters on 15.6T tokens using a context window of 8K tokens.</p>
+    </li>
+    <li>
+      <p>supported context window to 128K tokens</p>
+    </li>
+    <li>
+      <p>supervised finetuning on instruction tuning data and Direct Preference Optimization</p>
+    </li>
+    <li>
+      <p>annealing on small amounts of high-quality code and mathematical data can boost the performance of pre-trained models on key benchmarks</p>
+    </li>
+    <li>
+      <p>Llama 3 405B is trained on up to 16K H100 GPUs</p>
+    </li>
+    <li>
+      <p>use fully sharded data parallelism (FSDP) for training</p>
+    </li>
+    <li>
+      <p>design a new multi-message chat protocol which uses various special header and termination tokens.</p>
+    </li>
+    <li>
+      <p>average models obtained from experiments using various versions of data or hyperparameters at each RM, SFT, or DPO stage</p>
+    </li>
+  </ul>
+  <h2>36. OLMo (07/07/2024)</h2>
+  <ul>
+    <li>
+      <p><a href="https://arxiv.org/pdf/2402.00838">pdf</a>, <a href="https://huggingface.co/collections/allenai/olmo-suite-65aeaae8fe5b6b2122b46778">huggingface olmo</a>, <a href="https://huggingface.co/collections/allenai/olmo-2-674117b93ab84e98afc72edc">huggingface olmo-2</a></p>
+    </li>
+    <li>
+      <p>1B and 7B models, 2T tokens Dolma dataset</p>
+    </li>
+    <li>
+      <p>use up to 256 nodes on this cluster, where each node consists of 4x AMD MI250X GPUs with 128GB of memory5 and 800Gbps of interconnect</p>
+    </li>
+    <li>
+      <p>release model weights, training data and training and evaluation code.</p>
+    </li>
+  </ul>
+</div>
+ </div> <footer> <a href="/blog" class="back-link">← Back to Blog</a> </footer> </article> </div> </main> </body></html>
