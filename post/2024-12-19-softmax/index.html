@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Softmax: Math, Implementation, and GPU Optimization — Xiaotian Han</title><meta name="description" content="A mathematical and practical guide to softmax, including gradients, PyTorch implementations, and Triton GPU optimization."><meta name="author" content="Xiaotian Han"><link rel="canonical" href="https://ahxt.github.io/post/2024-12-19-softmax/"><meta property="og:site_name" content="Xiaotian Han"><meta property="og:title" content="Softmax: Math, Implementation, and GPU Optimization"><meta property="og:description" content="A mathematical and practical guide to softmax, including gradients, PyTorch implementations, and Triton GPU optimization."><meta property="og:type" content="article"><meta property="og:url" content="https://ahxt.github.io/post/2024-12-19-softmax/"><meta property="og:image" content="https://ahxt.github.io/post/2024-12-19-softmax/fwd.png"><meta property="article:published_time" content="2024-12-19"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Softmax: Math, Implementation, and GPU Optimization"><meta name="twitter:description" content="A mathematical and practical guide to softmax, including gradients, PyTorch implementations, and Triton GPU optimization."><meta name="twitter:image" content="https://ahxt.github.io/post/2024-12-19-softmax/fwd.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Softmax: Math, Implementation, and GPU Optimization",
+  "description": "A mathematical and practical guide to softmax, including gradients, PyTorch implementations, and Triton GPU optimization.",
+  "url": "https://ahxt.github.io/post/2024-12-19-softmax/",
+  "mainEntityOfPage": "https://ahxt.github.io/post/2024-12-19-softmax/",
+  "image": "https://ahxt.github.io/post/2024-12-19-softmax/fwd.png",
+  "inLanguage": "en",
+  "datePublished": "2024-12-19",
+  "author": {
+    "@type": "Person",
+    "name": "Xiaotian Han",
+    "url": "https://ahxt.github.io/"
+  }
+}</script><link rel="icon" href="../../favicon.svg?v=20260830-23" type="image/svg+xml"><link rel="icon" href="../../favicon.ico?v=20260830-23"><link rel="alternate" href="https://ahxt.github.io/feed.xml" type="application/atom+xml" title="Xiaotian Han — Posts"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&amp;family=Ubuntu+Mono:wght@400;700&amp;family=Noto+Sans+Math&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/atom-one-light.min.css"><script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.min.js" defer></script><link rel="stylesheet" href="../../assets/styles.css?v=20260830-23"><script src="../../assets/script.js?v=20260830-23" defer></script><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header class="site-header"><div class="site-header__inner"><a class="site-brand" href="../../.">Xiaotian Han</a><nav class="site-nav" aria-label="Primary"><a href="../../.">Home</a> <a href="../../post/" aria-current="page">Posts</a></nav><span hidden><a href="https://mapmyvisitors.com/web/1c4xw" title="Visit tracker"><img src="https://mapmyvisitors.com/map.png?d=HM5pqUc4d6kXiS4Wj_jHWzaZ531AEA-eUHA_BsCHuRo&amp;cl=ffffff" alt></a></span></div></header><article class="article"><aside class="article__toc" aria-label="Table of contents"><span class="article__toc-marker" aria-hidden="true"></span><ol><li><a href="#background">Background</a><ol><li><a href="#softmax---vector-form">softmax - vector form</a></li></ol></li><li><a href="#gradient-of-softmax-vector-form">Gradient of softmax (vector form)</a><ol><li><a href="#jacobian-matrix">Jacobian matrix</a></li><li><a href="#gradient-of">gradient of </a></li><li><a href="#avoid-explicit-jacobian">avoid explicit Jacobian</a></li></ol></li><li><a href="#softmax---batch-form">softmax - batch form</a><ol><li><a href="#forward-pass">forward pass</a></li><li><a href="#backward-pass">backward pass</a></li></ol></li><li><a href="#implementation">Implementation</a><ol><li><a href="#real-forward-pass">real forward pass</a></li><li><a href="#real-backward-pass">real backward pass</a></li><li><a href="#a-real-example">a real example</a></li><li><a href="#native-pytorch-implementation">native pytorch implementation</a></li><li><a href="#triton-implementation">triton implementation</a></li></ol></li><li><a href="#results-speed-comparison">Results: speed comparison</a></li><li><a href="#notations">Notations</a></li></ol></aside><main class="article__main"><header class="post-header"><h1 class="post-title">Softmax: Math, Implementation, and GPU Optimization</h1><div class="post-byline"><ul class="post-authors"><li>Xiaotian Han</li></ul><span class="post-byline__sep" aria-hidden="true">·</span> <time datetime="2024-12-19">December 19, 2024</time></div></header><section class="prose"><h2 id="background">Background</h2><p>The softmax function is a fundamental operation in deep learning that converts vectors of real numbers into probability distributions. This blog post explores the softmax function’s implementation and optimization using Triton, a programming framework for efficient GPU computations.</p><aside class="callout callout--tldr"><p class="callout__title">TL;DR</p><ul><li>dive into softmax, from math to implementation, from vector to matrix.</li><li>torch and triton implementations, with reference code and speed comparison.</li></ul></aside><p>The <strong>softmax function</strong> transforms an input vector into a <strong>probability distribution</strong> where all elements sum to 1.</p><h3 id="softmax---vector-form">softmax - vector form</h3><math display="block"><msub><mi>𝒐</mi><mi>𝑖</mi></msub><mo>=</mo><mtext>softmax</mtext><mrow><mo>(</mo><msub><mi>𝒙</mi><mi>𝑖</mi></msub><mo>)</mo></mrow><mo>=</mo><mfrac><msup><mi>𝑒</mi><msub><mi>𝒙</mi><mi>𝑖</mi></msub></msup><mrow><msubsup><mo lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑑</mi></msubsup><msup><mi>𝑒</mi><msub><mi>𝒙</mi><mi>𝑗</mi></msub></msup></mrow></mfrac></math><p>where:</p><ul><li><math><mi>𝒙</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑑</mi></msup></math>: input vector.</li><li><math><mi>𝒐</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑑</mi></msup></math>: output vector, probability distribution.</li></ul><h2 id="gradient-of-softmax-vector-form">Gradient of softmax (vector form)</h2><p>We will compute gradients <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac></math> given <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac></math>, where <math><mi>𝐿</mi></math> is loss function, <math><mi>𝒐</mi></math> is softmax output.</p><h3 id="jacobian-matrix">Jacobian matrix</h3><p>softmax is a vector function, the Jacobian matrix is the matrix of all partial derivatives:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac><mo>=</mo><mi>𝑱</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>1</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>1</mn></msub></mrow></mfrac></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>1</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>2</mn></msub></mrow></mfrac></mtd><mtd><mi>…</mi></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>1</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑑</mi></msub></mrow></mfrac></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>2</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>1</mn></msub></mrow></mfrac></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>2</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>2</mn></msub></mrow></mfrac></mtd><mtd><mi>…</mi></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mn>2</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑑</mi></msub></mrow></mfrac></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd><mtd><mi>⋮</mi></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑑</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>1</mn></msub></mrow></mfrac></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑑</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mn>2</mn></msub></mrow></mfrac></mtd><mtd><mi>…</mi></mtd><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑑</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑑</mi></msub></mrow></mfrac></mtd></mtr></mtable><mo>)</mo></mrow></math><p>For softmax, the derivative has two cases:</p><ol><li value="1"><p>when <math><mi>𝑖</mi><mo>=</mo><mi>𝑗</mi></math>, consider <math><msub><mi>𝒐</mi><mi>𝑖</mi></msub><mo>=</mo><mfrac><msup><mi>𝑒</mi><msub><mi>𝒙</mi><mi>𝑖</mi></msub></msup><mrow><msubsup><mo lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑑</mi></msubsup><msup><mi>𝑒</mi><msub><mi>𝒙</mi><mi>𝑗</mi></msub></msup></mrow></mfrac></math>, the derivative is:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑖</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑖</mi></msub></mrow></mfrac><mo>=</mo><msub><mi>𝒐</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><msub><mi>𝒐</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></math></li><li value="2"><p>similarly, when <math><mi>𝑖</mi><mo form="postfix">!</mo><mo>=</mo><mi>𝑗</mi></math>:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑖</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑗</mi></msub></mrow></mfrac><mo>=</mo><mo form="prefix">−</mo><msub><mi>𝒐</mi><mi>𝑖</mi></msub><msub><mi>𝒐</mi><mi>𝑗</mi></msub></math></li></ol><p>Thus, <math><mrow><mo>(</mo><mrow><mi>𝑖</mi><mo>,</mo><mi>𝑗</mi></mrow><mo>)</mo></mrow></math>-th element in Jacobian matrix will be:</p><math display="block"><msub><mi>𝑱</mi><mrow><mi>𝑖</mi><mi>𝑗</mi></mrow></msub><mo>=</mo><msub><mi>𝒐</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mrow><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mi>𝑗</mi></mrow></msub><mo>−</mo><msub><mi>𝒐</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow></math><p>where <math><mi>𝑱</mi></math> has shape <math><mrow><mo>[</mo><mrow><mi>𝑑</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math> and <math><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mi>𝑗</mi></mrow></msub></math> is the Kronecker delta, which is 1 if <math><mi>𝑖</mi><mo>=</mo><mi>𝑗</mi></math> and 0 otherwise.</p><p>In matrix form, the Jacobian of the softmax is:</p><math display="block"><mi>𝑱</mi><mo>=</mo><mtext>diag</mtext><mrow><mo>(</mo><mi>𝒐</mi><mo>)</mo></mrow><mo>−</mo><mi>𝒐</mi><msup><mi>𝒐</mi><mi>𝑇</mi></msup></math><p>where:</p><ul><li><math><mi>𝒐</mi></math> is the output of softmax, the shape is <math><mrow><mo>[</mo><mi>𝑑</mi><mo>]</mo></mrow></math>.</li><li><math><mtext>diag</mtext><mrow><mo>(</mo><mi>𝒐</mi><mo>)</mo></mrow></math> is a diagonal matrix of <math><mi>𝒐</mi></math>, the shape is <math><mrow><mo>[</mo><mrow><mi>𝑑</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math>.</li><li><math><mi>𝒐</mi><msup><mi>𝒐</mi><mi>𝑇</mi></msup></math> is the outer product of <math><mi>𝒐</mi></math> with itself, the shape is <math><mrow><mo>[</mo><mrow><mi>𝑑</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math>.</li></ul><h3 id="gradient-of">gradient of <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac></math></h3><p>Given <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac></math>, we can compute <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac></math> using the Jacobian matrix:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac><mo>=</mo><msup><mi>𝑱</mi><mi>𝑇</mi></msup><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac></math><p>where <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac></math> has shape <math><mrow><mo>[</mo><mi>𝑑</mi><mo>]</mo></mrow></math>, <math><msup><mi>𝑱</mi><mi>𝑇</mi></msup></math> has shape <math><mrow><mo>[</mo><mrow><mi>𝑑</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math>, and <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac></math> has shape <math><mrow><mo>[</mo><mi>𝑑</mi><mo>]</mo></mrow></math>.</p><h3 id="avoid-explicit-jacobian">avoid explicit Jacobian</h3><p>For the <math><mi>𝑖</mi></math>-th element of <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac></math>, we can decompose the computation to:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝒙</mi><mi>𝑖</mi></msub></mrow></mfrac><mo>=</mo><msub><mi>𝒐</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑖</mi></msub></mrow></mfrac><mo>−</mo><munderover><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑑</mi></munderover><msub><mi>𝒐</mi><mi>𝑗</mi></msub><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝒐</mi><mi>𝑗</mi></msub></mrow></mfrac></mrow><mo>)</mo></mrow></math><p>This leads to an efficient vector form:</p><math display="block"><msub><mi>𝑠</mi><mtext>grad</mtext></msub><mo>=</mo><msub><mrow><mo>(</mo><mrow><mi>𝒐</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>sum</mtext></msub></math><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒙</mi></mrow></mfrac><mo>=</mo><mi>𝒐</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝒐</mi></mrow></mfrac><mo>−</mo><msub><mi>𝑠</mi><mtext>grad</mtext></msub></mrow><mo>)</mo></mrow></math><h2 id="softmax---batch-form">softmax - batch form</h2><p><math><mi>𝑿</mi></math>: A <strong>batch</strong> of input vectors.</p><math display="block"><mi>𝑿</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math><p>where:</p><ul><li><math><mi>𝑁</mi></math> is batch size.</li><li><math><mi>𝑑</mi></math> is vector dimension.</li></ul><h3 id="forward-pass">forward pass</h3><math display="block"><mi>𝑬</mi><mo>=</mo><msup><mi>𝑒</mi><mi>𝑿</mi></msup></math><math display="block"><mi>𝒔</mi><mo>=</mo><munderover><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑑</mi></munderover><msup><mi>𝑒</mi><msub><mi>𝑿</mi><mrow><mi>𝑖</mi><mi>𝑗</mi></mrow></msub></msup></math><math display="block"><mi>𝑶</mi><mo>=</mo><mfrac><mi>𝑬</mi><mi>𝒔</mi></mfrac></math><p>where <math><mi>𝑬</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math>, <math><mi>𝒔</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mn>1</mn></mrow></msup></math>, <math><mi>𝑶</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math>.</p><h3 id="backward-pass">backward pass</h3><p>We have gradient with respect to softmax output:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math><p>we compute the gradient:</p><math display="block"><msub><mi>𝒔</mi><mtext>grad</mtext></msub><mo>=</mo><msub><mrow><mo>(</mo><mrow><mi>𝑶</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>row_sum</mtext></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mn>1</mn></mrow></msup></math><p>where <math><mi>𝑶</mi></math> has size <math><mrow><mo>[</mo><mrow><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math>, and <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></math> has size <math><mrow><mo>[</mo><mrow><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></math>.</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑿</mi></mrow></mfrac><mo>=</mo><mi>𝑶</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mo>−</mo><msub><mi>𝒔</mi><mtext>grad</mtext></msub></mrow><mo>)</mo></mrow></math><p>where <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑿</mi></mrow></mfrac><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math> and <math><mi>𝑶</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math> and <math><msub><mi>𝒔</mi><mtext>grad</mtext></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mn>1</mn></mrow></msup></math> will be broadcasted to <math><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math>.</p><h2 id="implementation">Implementation</h2><p>In practice, we subtract the maximum value from each row before applying <code>exp()</code> to prevent numerical overflow:</p><h3 id="real-forward-pass">real forward pass</h3><p>For input <math><mi>𝑿</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math>:</p><math display="block"><msub><mi>𝑿</mi><mtext>max</mtext></msub><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mo>(</mo><mi>𝑿</mi><mo>)</mo></mrow><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mn>1</mn></mrow></msup></math><math display="block"><mi>𝑬</mi><mo>=</mo><msup><mi>𝑒</mi><mrow><mi>𝑿</mi><mo lspace="0em" rspace="0em">−</mo><msub><mi>𝑿</mi><mtext>max</mtext></msub></mrow></msup></math><math display="block"><mi>𝒔</mi><mo>=</mo><munderover><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑑</mi></munderover><msup><mi>𝑒</mi><mrow><msub><mi>𝑿</mi><mrow><mi>𝑖</mi><mi>𝑗</mi></mrow></msub><mo lspace="0em" rspace="0em">−</mo><msub><mi>𝑿</mi><mtext>max</mtext></msub></mrow></msup></math><math display="block"><mi>𝑶</mi><mo>=</mo><mfrac><mi>𝑬</mi><mi>𝒔</mi></mfrac></math><h3 id="real-backward-pass">real backward pass</h3><p>we have <math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math> and cached <math><mi>𝑶</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math></p><math display="block"><msub><mi>𝒔</mi><mtext>grad</mtext></msub><mo>=</mo><msub><mrow><mo>(</mo><mrow><mi>𝑶</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>row_sum</mtext></msub></math><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑿</mi></mrow></mfrac><mo>=</mo><mi>𝑶</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mo>−</mo><msub><mi>𝒔</mi><mtext>grad</mtext></msub></mrow><mo>)</mo></mrow></math><h3 id="a-real-example">a real example</h3><p>give a real example to show how to implement softmax and its backward pass in pytorch and triton.</p><p>forwards pass is as follows:</p><math display="block"><mi>𝑋</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>1.0</mn></mtd><mtd><mn>2.0</mn></mtd><mtd><mn>3.0</mn></mtd></mtr><mtr><mtd><mn>1.0</mn></mtd><mtd><mn>3.0</mn></mtd><mtd><mn>5.0</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><msub><mi>𝑋</mi><mtext>max</mtext></msub><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>3.0</mn></mtd></mtr><mtr><mtd><mn>5.0</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝑋</mi><mo>−</mo><msub><mi>𝑋</mi><mtext>max</mtext></msub><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mo>−</mo><mn>2.0</mn></mtd><mtd><mo>−</mo><mn>1.0</mn></mtd><mtd><mn>0.0</mn></mtd></mtr><mtr><mtd><mo>−</mo><mn>4.0</mn></mtd><mtd><mo>−</mo><mn>2.0</mn></mtd><mtd><mn>0.0</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝐸</mi><mo>=</mo><msup><mi>𝑒</mi><mrow><mi>𝑋</mi><mo lspace="0em" rspace="0em">−</mo><msub><mi>𝑋</mi><mtext>max</mtext></msub></mrow></msup><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><msup><mi>𝑒</mi><mrow><mo>−</mo><mn>2.0</mn></mrow></msup></mtd><mtd><msup><mi>𝑒</mi><mrow><mo>−</mo><mn>1.0</mn></mrow></msup></mtd><mtd><msup><mi>𝑒</mi><mn>0.0</mn></msup></mtd></mtr><mtr><mtd><msup><mi>𝑒</mi><mrow><mo>−</mo><mn>4.0</mn></mrow></msup></mtd><mtd><msup><mi>𝑒</mi><mrow><mo>−</mo><mn>2.0</mn></mrow></msup></mtd><mtd><msup><mi>𝑒</mi><mn>0.0</mn></msup></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝐸</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>0.1353</mn></mtd><mtd><mn>0.3679</mn></mtd><mtd><mn>1.0000</mn></mtd></mtr><mtr><mtd><mn>0.0183</mn></mtd><mtd><mn>0.1353</mn></mtd><mtd><mn>1.0000</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝑆</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>1.5032</mn></mtd></mtr><mtr><mtd><mn>1.1536</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝑂</mi><mo>=</mo><mfrac><mi>𝐸</mi><mi>𝑆</mi></mfrac><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>0.0900</mn></mtd><mtd><mn>0.2447</mn></mtd><mtd><mn>0.6652</mn></mtd></mtr><mtr><mtd><mn>0.0159</mn></mtd><mtd><mn>0.1173</mn></mtd><mtd><mn>0.8668</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><p>backward pass is as follows:</p><math display="block"><mi>𝑑</mi><mi>𝑂</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>0.1</mn></mtd><mtd><mn>0.2</mn></mtd><mtd><mn>0.7</mn></mtd></mtr><mtr><mtd><mn>0.2</mn></mtd><mtd><mn>0.3</mn></mtd><mtd><mn>0.5</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><msub><mi>𝑠</mi><mtext>grad</mtext></msub><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>0.2036</mn></mtd></mtr><mtr><mtd><mn>0.2597</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><math display="block"><mi>𝑑</mi><mi>𝑋</mi><mo>=</mo><mi>𝑂</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mi>𝑑</mi><mi>𝑂</mi><mo>−</mo><msub><mi>𝑠</mi><mtext>grad</mtext></msub></mrow><mo>)</mo></mrow></math><math display="block"><mi>𝑑</mi><mi>𝑋</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mo>−</mo><mn>0.0381</mn></mtd><mtd><mo>−</mo><mn>0.0792</mn></mtd><mtd><mn>0.1173</mn></mtd></mtr><mtr><mtd><mo>−</mo><mn>0.0043</mn></mtd><mtd><mo>−</mo><mn>0.0202</mn></mtd><mtd><mn>0.0245</mn></mtd></mtr></mtable><mo>)</mo></mrow></math><h3 id="native-pytorch-implementation">native pytorch implementation</h3><pre><code data-lang="python"><span style="color: #d73948">import</span> torch
+<span style="color: #d73948">import</span> torch.nn.functional <span style="color: #d73948">as</span> F
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Custom Forward Pass (Numerically Stable Softmax)</span>
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_forward</span>(X):
+    X_max <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">max</span>(X, dim<span style="color: #d73948">=</span><span style="color: #b60157">1</span>, keepdim<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)[<span style="color: #b60157">0</span>]  <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, 1)</span>
+    E <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">exp</span>(X <span style="color: #d73948">-</span> X_max)                     <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, d)</span>
+    S <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">sum</span>(E, dim<span style="color: #d73948">=</span><span style="color: #b60157">1</span>, keepdim<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)        <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, 1)</span>
+    O <span style="color: #d73948">=</span> E <span style="color: #d73948">/</span> S                                    <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, d)</span>
+    <span style="color: #d73948">return</span> O
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Custom Backward Pass (Gradient Calculation)</span>
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_backward</span>(dL_dO, O):
+    s_grad <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">sum</span>(O <span style="color: #d73948">*</span> dL_dO, dim<span style="color: #d73948">=</span><span style="color: #b60157">1</span>, keepdim<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)  <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, 1)</span>
+    dL_dX <span style="color: #d73948">=</span> O <span style="color: #d73948">*</span> (dL_dO <span style="color: #d73948">-</span> s_grad)                        <span style="color: #74747c">#</span><span style="color: #74747c"> Shape: (N, d)</span>
+    <span style="color: #d73948">return</span> dL_dX
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Example Inputs</span>
+X <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">tensor</span>([[<span style="color: #b60157">1</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">2</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">3</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>], [<span style="color: #b60157">1</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">3</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">5</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>]], requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+dL_dO <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">tensor</span>([[<span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">1</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">2</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">7</span>], [<span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">2</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">3</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">5</span>]])
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Custom Implementation - Forward</span>
+O_custom <span style="color: #d73948">=</span> <span style="color: #4b69c6">softmax_forward</span>(X)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> PyTorch Implementation - Forward</span>
+O_pytorch <span style="color: #d73948">=</span> F.<span style="color: #4b69c6">softmax</span>(X, dim<span style="color: #d73948">=</span><span style="color: #b60157">1</span>)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Verify Forward Output</span>
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Custom Softmax Output:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, O_custom)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">PyTorch Softmax Output:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, O_pytorch)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Forward Pass Match:</span><span style="color: #198810">"</span>, torch.<span style="color: #4b69c6">allclose</span>(O_custom, O_pytorch))
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Custom Implementation - Backward</span>
+dL_dX_custom <span style="color: #d73948">=</span> <span style="color: #4b69c6">softmax_backward</span>(dL_dO, O_custom)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> PyTorch Automatic Gradient Calculation</span>
+O_pytorch.<span style="color: #4b69c6">backward</span>(dL_dO)  <span style="color: #74747c">#</span><span style="color: #74747c"> Computes gradient using PyTorch autograd</span>
+dL_dX_pytorch <span style="color: #d73948">=</span> X.grad
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Verify Backward Output</span>
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #1d6c76">\n</span><span style="color: #198810">Custom Gradient w.r.t Input:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, dL_dX_custom)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">PyTorch Gradient w.r.t Input:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, dL_dX_pytorch)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Backward Pass Match:</span><span style="color: #198810">"</span>, torch.<span style="color: #4b69c6">allclose</span>(dL_dX_custom, dL_dX_pytorch))</code></pre><p>output:</p><pre><code data-lang="bash"><span style="color: #4b69c6">Custom</span> Softmax Output:
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[0.0900, 0.2447, 0.6652<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[0.0159,</span> 0.1173, 0.8668]], grad_fn=<span style="color: #d73948">&lt;</span>DivBackward0<span style="color: #d73948">></span>)
+<span style="color: #4b69c6">PyTorch</span> Softmax Output:
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[0.0900, 0.2447, 0.6652<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[0.0159,</span> 0.1173, 0.8668]], grad_fn=<span style="color: #d73948">&lt;</span>SoftmaxBackward0<span style="color: #d73948">></span>)
+<span style="color: #4b69c6">Forward</span> Pass Match: True
+
+<span style="color: #4b69c6">Custom</span> Gradient w.r.t Input:
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[<span style="color: #d73948">-</span>0.0381, <span style="color: #d73948">-</span>0.0792,  0.1173<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[-0.0043,</span> -0.0202,  0.0245]], grad_fn=<span style="color: #d73948">&lt;</span>MulBackward0<span style="color: #d73948">></span>)
+<span style="color: #4b69c6">PyTorch</span> Gradient w.r.t Input:
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[<span style="color: #d73948">-</span>0.0381, <span style="color: #d73948">-</span>0.0792,  0.1173<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[-0.0043,</span> -0.0202,  0.0245]])
+<span style="color: #4b69c6">Backward</span> Pass Match: True</code></pre><h3 id="triton-implementation">triton implementation</h3><pre><code data-lang="python"><span style="color: #d73948">from</span> typing <span style="color: #d73948">import</span> Optional
+
+<span style="color: #d73948">import</span> torch
+<span style="color: #d73948">import</span> triton
+<span style="color: #d73948">import</span> triton.language <span style="color: #d73948">as</span> tl
+
+
+<span style="color: #301414">@</span><span style="color: #301414">triton</span><span style="color: #301414">.</span><span style="color: #301414">jit</span>
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_fwd_kernel</span>(
+    X,
+    O,
+    D: tl.constexpr,
+    B: tl.constexpr
+):
+    i_n <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">program_id</span>(<span style="color: #b60157">0</span>)
+    o_d <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">arange</span>(<span style="color: #b60157">0</span>, B)
+    m_d <span style="color: #d73948">=</span> o_d <span style="color: #d73948">&lt;</span> D
+
+    X_max <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">max</span>(tl.<span style="color: #4b69c6">load</span>(X <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, mask<span style="color: #d73948">=</span>m_d, other<span style="color: #d73948">=</span><span style="color: #d73948">-</span><span style="color: #4b69c6">float</span>(<span style="color: #198810">'</span><span style="color: #198810">inf</span><span style="color: #198810">'</span>)), <span style="color: #b60157">0</span>)
+    E <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">exp</span>(tl.<span style="color: #4b69c6">load</span>(X <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, mask<span style="color: #d73948">=</span>m_d, other<span style="color: #d73948">=</span><span style="color: #d73948">-</span><span style="color: #4b69c6">float</span>(<span style="color: #198810">'</span><span style="color: #198810">inf</span><span style="color: #198810">'</span>)) <span style="color: #d73948">-</span> X_max)
+    S <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">sum</span>(E, <span style="color: #b60157">0</span>)
+    P <span style="color: #d73948">=</span> E <span style="color: #d73948">/</span> S
+
+    tl.<span style="color: #4b69c6">store</span>(O <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, P.<span style="color: #4b69c6">to</span>(O.dtype.element_ty), mask<span style="color: #d73948">=</span>m_d)
+
+
+<span style="color: #301414">@</span><span style="color: #301414">triton</span><span style="color: #301414">.</span><span style="color: #301414">jit</span>
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_bwd_kernel</span>(
+    O,
+    dO,
+    dX,
+    D: tl.constexpr,
+    B: tl.constexpr
+):
+    i_n <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">program_id</span>(<span style="color: #b60157">0</span>)
+    o_d <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">arange</span>(<span style="color: #b60157">0</span>, B)
+    m_d <span style="color: #d73948">=</span> o_d <span style="color: #d73948">&lt;</span> D
+
+    P <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">load</span>(O <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, mask<span style="color: #d73948">=</span>m_d, other<span style="color: #d73948">=</span><span style="color: #b60157">0</span><span style="color: #b60157">.</span>)
+    dP <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">load</span>(dO <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, mask<span style="color: #d73948">=</span>m_d, other<span style="color: #d73948">=</span><span style="color: #b60157">0</span><span style="color: #b60157">.</span>)
+    s_grad <span style="color: #d73948">=</span> tl.<span style="color: #4b69c6">sum</span>(P <span style="color: #d73948">*</span> dP, <span style="color: #b60157">0</span>)
+    dX_row <span style="color: #d73948">=</span> P <span style="color: #d73948">*</span> (dP <span style="color: #d73948">-</span> s_grad)
+
+    tl.<span style="color: #4b69c6">store</span>(dX <span style="color: #d73948">+</span> i_n <span style="color: #d73948">*</span> D <span style="color: #d73948">+</span> o_d, dX_row.<span style="color: #4b69c6">to</span>(dX.dtype.element_ty), mask<span style="color: #d73948">=</span>m_d)
+
+
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_fwd</span>(
+    X: torch.Tensor,
+    dtype: Optional[torch.dtype] <span style="color: #d73948">=</span> torch.float
+) -> torch.Tensor:
+    shape <span style="color: #d73948">=</span> X.shape
+    X <span style="color: #d73948">=</span> X.<span style="color: #4b69c6">view</span>(<span style="color: #d73948">-</span><span style="color: #b60157">1</span>, X.shape[<span style="color: #d73948">-</span><span style="color: #b60157">1</span>])
+
+    N, D <span style="color: #d73948">=</span> X.shape
+    B <span style="color: #d73948">=</span> triton.<span style="color: #4b69c6">next_power_of_2</span>(D)
+
+    O <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">empty_like</span>(X, dtype<span style="color: #d73948">=</span>dtype)
+    softmax_fwd_kernel[(N,)](
+        X<span style="color: #d73948">=</span>X,
+        O<span style="color: #d73948">=</span>O,
+        D<span style="color: #d73948">=</span>D,
+        B<span style="color: #d73948">=</span>B
+    )
+    <span style="color: #d73948">return</span> O.<span style="color: #4b69c6">view</span>(<span style="color: #d73948">*</span>shape)
+
+
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">softmax_bwd</span>(
+    O: torch.Tensor,
+    dO: torch.Tensor,
+    dtype: Optional[torch.dtype] <span style="color: #d73948">=</span> torch.float
+) -> torch.Tensor:
+    shape <span style="color: #d73948">=</span> O.shape
+    O <span style="color: #d73948">=</span> O.<span style="color: #4b69c6">view</span>(<span style="color: #d73948">-</span><span style="color: #b60157">1</span>, O.shape[<span style="color: #d73948">-</span><span style="color: #b60157">1</span>])
+    dX <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">empty_like</span>(O, dtype<span style="color: #d73948">=</span>dtype)
+
+    N, D <span style="color: #d73948">=</span> O.shape
+    B <span style="color: #d73948">=</span> triton.<span style="color: #4b69c6">next_power_of_2</span>(D)
+    softmax_bwd_kernel[(N,)](
+        O<span style="color: #d73948">=</span>O,
+        dO<span style="color: #d73948">=</span>dO,
+        dX<span style="color: #d73948">=</span>dX,
+        D<span style="color: #d73948">=</span>D,
+        B<span style="color: #d73948">=</span>B
+    )
+    <span style="color: #d73948">return</span> dX.<span style="color: #4b69c6">view</span>(<span style="color: #d73948">*</span>shape)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Test code to verify correctness</span>
+<span style="color: #d73948">import</span> torch.nn.functional <span style="color: #d73948">as</span> F
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Example inputs</span>
+X <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">tensor</span>([[<span style="color: #b60157">1</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">2</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">3</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>], [<span style="color: #b60157">1</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">3</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>, <span style="color: #b60157">5</span><span style="color: #b60157">.</span><span style="color: #b60157">0</span>]], requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>, device<span style="color: #d73948">=</span><span style="color: #198810">'</span><span style="color: #198810">cuda</span><span style="color: #198810">'</span>)
+dP <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">tensor</span>([[<span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">1</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">2</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">7</span>], [<span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">2</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">3</span>, <span style="color: #b60157">0</span><span style="color: #b60157">.</span><span style="color: #b60157">5</span>]], device<span style="color: #d73948">=</span><span style="color: #198810">'</span><span style="color: #198810">cuda</span><span style="color: #198810">'</span>)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Forward pass</span>
+P_triton <span style="color: #d73948">=</span> <span style="color: #4b69c6">softmax_fwd</span>(X)
+P_torch <span style="color: #d73948">=</span> F.<span style="color: #4b69c6">softmax</span>(X, dim<span style="color: #d73948">=</span><span style="color: #b60157">1</span>)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Verify forward pass</span>
+<span style="color: #4b69c6">print</span>( <span style="color: #198810">"</span><span style="color: #198810">P_triton:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, P_triton)
+<span style="color: #4b69c6">print</span>( <span style="color: #198810">"</span><span style="color: #198810">P_torch:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, P_torch)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Forward Pass Match:</span><span style="color: #198810">"</span>, torch.<span style="color: #4b69c6">allclose</span>(P_triton, P_torch))
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Backward pass</span>
+
+dX_triton <span style="color: #d73948">=</span> <span style="color: #4b69c6">softmax_bwd</span>(P_triton, dP)
+P_torch.<span style="color: #4b69c6">backward</span>(dP)
+dX_torch <span style="color: #d73948">=</span> X.grad
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Verify backward pass</span>
+<span style="color: #4b69c6">print</span>( <span style="color: #198810">"</span><span style="color: #198810">dX_triton:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, dX_triton)
+<span style="color: #4b69c6">print</span>( <span style="color: #198810">"</span><span style="color: #198810">dX_torch:</span><span style="color: #1d6c76">\n</span><span style="color: #198810">"</span>, dX_torch)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Backward Pass Match:</span><span style="color: #198810">"</span>, torch.<span style="color: #4b69c6">allclose</span>(dX_triton, dX_torch))</code></pre><p>output:</p><pre><code data-lang="bash"><span style="color: #4b69c6">P_triton:</span>
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[0.0900, 0.2447, 0.6652<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[0.0159,</span> 0.1173, 0.8668]], device=<span style="color: #198810">'</span><span style="color: #198810">cuda:0</span><span style="color: #198810">'</span>)
+<span style="color: #4b69c6">P_torch:</span>
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[0.0900, 0.2447, 0.6652<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[0.0159,</span> 0.1173, 0.8668]], device=<span style="color: #198810">'</span><span style="color: #198810">cuda:0</span><span style="color: #198810">'</span>, grad_fn=<span style="color: #d73948">&lt;</span>SoftmaxBackward0<span style="color: #d73948">></span>)
+<span style="color: #4b69c6">Forward</span> Pass Match: True
+<span style="color: #4b69c6">dX_triton:</span>
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[<span style="color: #d73948">-</span>0.0381, <span style="color: #d73948">-</span>0.0792,  0.1173<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[-0.0043,</span> -0.0202,  0.0245]], device=<span style="color: #198810">'</span><span style="color: #198810">cuda:0</span><span style="color: #198810">'</span>)
+<span style="color: #4b69c6">dX_torch:</span>
+ <span style="color: #4b69c6">tensor</span>(<span style="color: #d73948">[</span>[<span style="color: #d73948">-</span>0.0381, <span style="color: #d73948">-</span>0.0792,  0.1173<span style="color: #d73948">]</span>,
+        <span style="color: #4b69c6">[-0.0043,</span> -0.0202,  0.0245]], device=<span style="color: #198810">'</span><span style="color: #198810">cuda:0</span><span style="color: #198810">'</span>)
+<span style="color: #4b69c6">Backward</span> Pass Match: True</code></pre><h2 id="results-speed-comparison">Results: speed comparison</h2><p>The performance comparison between PyTorch and Triton implementations reveals:</p><figure><img src="fwd.png" alt="forward pass" width="571" height="432" loading="lazy" decoding="async"><figcaption><span class="label">Figure 1.</span> forward pass</figcaption></figure><figure><img src="bwd.png" alt="backward pass" width="562" height="432" loading="lazy" decoding="async"><figcaption><span class="label">Figure 2.</span> backward pass</figcaption></figure><p>Results show</p><ul><li>forward pass: triton implementation is stable, while the PyTorch implementation is faster for most batch sizes but shows fluctuations for a few.</li><li>backward pass: triton implementation outperforms the pytorch implementation across most batch sizes. (the comparison may not be entirely fair, as triton caches the output <math><mi>𝑂</mi></math>, whereas pytorch’s handling intermediate values is unclear.)</li></ul><h2 id="notations">Notations</h2><table><tr><td><strong>symbol</strong></td><td><strong>shape</strong></td><td><strong>definition</strong></td></tr><tr><td><math><mi>𝒙</mi></math></td><td><math><mi>𝑑</mi></math></td><td>Input vector</td></tr><tr><td><math><mi>𝒐</mi></math></td><td><math><mi>𝑑</mi></math></td><td>Output vector (probability distribution)</td></tr><tr><td><math><mi>𝐿</mi></math></td><td>Scalar</td><td>Loss function</td></tr><tr><td><math><mi>𝑱</mi></math></td><td><math><mi>𝑑</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></math></td><td>Jacobian matrix</td></tr><tr><td><math><mi>𝑿</mi></math></td><td><math><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></math></td><td>Batch of input vectors (matrix)</td></tr><tr><td><math><mi>𝑶</mi></math></td><td><math><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></math></td><td>Batch output probabilities</td></tr><tr><td><math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></math></td><td><math><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></math></td><td>Gradient w.r.t. output probabilities</td></tr><tr><td><math><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑿</mi></mrow></mfrac></math></td><td><math><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑑</mi></math></td><td>Gradient w.r.t. input vectors</td></tr><tr><td><math><msub><mi>𝑠</mi><mtext>grad</mtext></msub></math></td><td><math><mi>𝑁</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mn>1</mn></math></td><td>Summation of gradients, <math><msub><mi>𝑠</mi><mtext>grad</mtext></msub><mo>=</mo><msub><mrow><mo>(</mo><mrow><mi>𝑶</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>sum</mtext></msub></math></td></tr></table><p><strong>Note:</strong></p><ul><li>Symbols like <math><mi>𝑥</mi></math>, <math><mi>𝒙</mi></math>, <math><mi>𝑿</mi></math> represent scalars, vectors, or matrices, where uppercase denotes batch forms.</li><li><math><msub><mi>𝑿</mi><mrow><mo form="infix" rspace="0em">:</mo><mo rspace="0em">,</mo><mi>𝑖</mi></mrow></msub></math> denotes a column vector, <math><msub><mi>𝑿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mo form="infix" rspace="0em">:</mo></mrow></msub></math> denotes a row vector, <math><msub><mi>𝑿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mi>𝑗</mi></mrow></msub></math> and denote the <math><mrow><mo>(</mo><mrow><mi>𝑖</mi><mo>,</mo><mi>𝑗</mi></mrow><mo>)</mo></mrow></math>-th element</li><li><math><msub><mi>𝒙</mi><mi>𝑖</mi></msub></math> denote the <math><mi>𝑖</mi></math>-th element.</li></ul></section></main></article><footer class="site-footer"><div class="site-footer__inner">© 2026 Xiaotian Han</div></footer><button type="button" class="to-top" aria-label="Back to top" title="Back to top">↑</button></body></html>

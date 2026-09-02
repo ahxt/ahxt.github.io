@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>FlashAttention with Trainable Bias Terms — Xiaotian Han</title><meta name="description" content="A derivation and implementation of FlashAttention with trainable bias terms, including forward and backward passes."><meta name="author" content="Xiaotian Han"><link rel="canonical" href="https://ahxt.github.io/post/2024-10-20-attention/"><meta property="og:site_name" content="Xiaotian Han"><meta property="og:title" content="FlashAttention with Trainable Bias Terms"><meta property="og:description" content="A derivation and implementation of FlashAttention with trainable bias terms, including forward and backward passes."><meta property="og:type" content="article"><meta property="og:url" content="https://ahxt.github.io/post/2024-10-20-attention/"><meta property="og:image" content="https://ahxt.github.io/xt.png"><meta property="article:published_time" content="2024-10-20"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="FlashAttention with Trainable Bias Terms"><meta name="twitter:description" content="A derivation and implementation of FlashAttention with trainable bias terms, including forward and backward passes."><meta name="twitter:image" content="https://ahxt.github.io/xt.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FlashAttention with Trainable Bias Terms",
+  "description": "A derivation and implementation of FlashAttention with trainable bias terms, including forward and backward passes.",
+  "url": "https://ahxt.github.io/post/2024-10-20-attention/",
+  "mainEntityOfPage": "https://ahxt.github.io/post/2024-10-20-attention/",
+  "image": "https://ahxt.github.io/xt.png",
+  "inLanguage": "en",
+  "datePublished": "2024-10-20",
+  "author": {
+    "@type": "Person",
+    "name": "Xiaotian Han",
+    "url": "https://ahxt.github.io/"
+  }
+}</script><link rel="icon" href="../../favicon.svg?v=20260830-23" type="image/svg+xml"><link rel="icon" href="../../favicon.ico?v=20260830-23"><link rel="alternate" href="https://ahxt.github.io/feed.xml" type="application/atom+xml" title="Xiaotian Han — Posts"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&amp;family=Ubuntu+Mono:wght@400;700&amp;family=Noto+Sans+Math&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/atom-one-light.min.css"><script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.min.js" defer></script><link rel="stylesheet" href="../../assets/styles.css?v=20260830-23"><script src="../../assets/script.js?v=20260830-23" defer></script><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header class="site-header"><div class="site-header__inner"><a class="site-brand" href="../../.">Xiaotian Han</a><nav class="site-nav" aria-label="Primary"><a href="../../.">Home</a> <a href="../../post/" aria-current="page">Posts</a></nav><span hidden><a href="https://mapmyvisitors.com/web/1c4xw" title="Visit tracker"><img src="https://mapmyvisitors.com/map.png?d=HM5pqUc4d6kXiS4Wj_jHWzaZ531AEA-eUHA_BsCHuRo&amp;cl=ffffff" alt></a></span></div></header><article class="article"><aside class="article__toc" aria-label="Table of contents"><span class="article__toc-marker" aria-hidden="true"></span><ol><li><a href="#background">Background</a></li><li><a href="#attention">Attention</a></li><li><a href="#backprop-derivation">Backprop Derivation</a><ol><li><a href="#gradient-of-v-and-a">Gradient of V and A</a></li><li><a href="#gradient-of-s">Gradient of S</a></li><li><a href="#gradient-of-b">Gradient of B</a></li><li><a href="#gradient-of-q-k">Gradient of Q, K</a></li><li><a href="#all-gradients">All gradients</a></li></ol></li><li><a href="#pytorch-implementation">PyTorch implementation</a></li></ol></aside><main class="article__main"><header class="post-header"><h1 class="post-title">FlashAttention with Trainable Bias Terms</h1><div class="post-byline"><ul class="post-authors"><li>Xiaotian Han</li></ul><span class="post-byline__sep" aria-hidden="true">·</span> <time datetime="2024-10-20">October 20, 2024</time></div></header><section class="prose"><h2 id="background">Background</h2><p>Until now, the official FlashAttention implementation does not support a bias term. FlexAttention in <code>torch</code> is trying to support the bias term now. In this blog, I will show how to implement a minimal FlashAttention with a trainable bias term.</p><aside class="callout callout--tldr"><p class="callout__title">TL;DR</p><ul><li>Gradient-enabled bias term is required for most protein language models, like EvoFormer.<sup class="sidenote-number"></sup><aside class="sidenote">EvoFormer is the core attention module in AlphaFold2, where pair representations are added as bias terms to the attention logits and must receive gradients during training.</aside></li><li>Trainable bias terms need to accumulate gradients.</li></ul></aside><h2 id="attention">Attention</h2><p>The attention with gradient-enabled bias term is defined as:</p><math display="block"><mi>𝑶</mi><mo>=</mo><mtext>softmax</mtext><mrow><mo>(</mo><mrow><mfrac><msup><mrow><mi>𝑸</mi><mi>𝑲</mi></mrow><mi>𝑇</mi></msup><msqrt><mi>𝑑</mi></msqrt></mfrac><mo>+</mo><mi>𝑩</mi></mrow><mo>)</mo></mrow><mi>𝑽</mi></math><p>where</p><ul><li><math><mi>𝑩</mi></math> is the bias term and the shape is <math><mrow><mo>(</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>)</mo></mrow></math></li><li>The shape of <math><mi>𝑸</mi><mo>,</mo><mi>𝑲</mi><mo>,</mo><mi>𝑽</mi></math> is <math><mrow><mo>(</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>)</mo></mrow></math></li><li><math><mi>𝑛</mi></math> is batch size, <math><mi>ℎ</mi></math> is number of heads, <math><mi>𝑙</mi></math> is sequence length, <math><mi>𝑑</mi></math> is hidden dimension.</li></ul><p>The gradient of <math><mi>𝑩</mi></math> is accumulated during the training process.</p><h2 id="backprop-derivation">Backprop Derivation</h2><p>Let</p><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝑺</mi></mtd><mtd><mo form="infix">=</mo><mfrac><msup><mrow><mi>𝑸</mi><mi>𝑲</mi></mrow><mi>𝑇</mi></msup><msqrt><mi>𝑑</mi></msqrt></mfrac><mo>+</mo><mi>𝑩</mi></mtd></mtr><mtr><mtd><mi>𝑨</mi></mtd><mtd><mo form="infix">=</mo><mtext>softmax</mtext><mrow><mo>(</mo><mi>𝑺</mi><mo>)</mo></mrow><mo>=</mo><mtext>softmax</mtext><mrow><mo>(</mo><mrow><mfrac><msup><mrow><mi>𝑸</mi><mi>𝑲</mi></mrow><mi>𝑇</mi></msup><msqrt><mi>𝑑</mi></msqrt></mfrac><mo>+</mo><mi>𝑩</mi></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mi>𝑶</mi></mtd><mtd><mo form="infix">=</mo><mi>𝑨</mi><mi>𝑽</mi><mo>=</mo><mtext>softmax</mtext><mrow><mo>(</mo><mi>𝑺</mi><mo>)</mo></mrow><mi>𝑽</mi><mo>=</mo><mtext>softmax</mtext><mrow><mo>(</mo><mrow><mfrac><msup><mrow><mi>𝑸</mi><mi>𝑲</mi></mrow><mi>𝑇</mi></msup><msqrt><mi>𝑑</mi></msqrt></mfrac><mo>+</mo><mi>𝑩</mi></mrow><mo>)</mo></mrow><mi>𝑽</mi></mtd></mtr></mtable></math><p>We already have the gradient with respect to <math><mi>𝑶</mi></math>:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mspace width="1em"/><mrow><mo>(</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow><mo>)</mo></mrow><mi>.</mi></math><p>In the following, we think of each <math><mrow><mo>(</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi></mrow><mo>)</mo></mrow></math> slice as a separate matrix multiply.</p><h3 id="gradient-of-v-and-a">Gradient of <math><mi>𝑽</mi></math> and <math><mi>𝑨</mi></math></h3><p>Since</p><math display="block"><mi>𝑶</mi><mo>=</mo><mi>𝑨</mi><mi>𝑽</mi><mspace width="1em"/><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></mrow><mo>)</mo></mrow></math><p>, we get</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mspace width="0.2222em"/><mtext>bmm</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><msup><mi>𝑽</mi><mi>𝑇</mi></msup><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></mrow><mo>)</mo></mrow></math><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑽</mi></mrow></mfrac><mo>=</mo><msup><mi>𝑨</mi><mi>𝑇</mi></msup><mspace width="0.2222em"/><mtext>bmm</mtext><mspace width="0.2222em"/><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mo rspace="0em">,</mo><mspace width="1em"/><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑑</mi></mrow><mo>]</mo></mrow></mrow><mo>)</mo></mrow></math><h3 id="gradient-of-s">Gradient of <math><mi>𝑺</mi></math></h3><p>It is easy to get the gradient of <math><mi>𝑺</mi></math> based on chain rule:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><msub><mrow><mo>(</mo><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow><mo>)</mo></mrow><mrow><mi>𝑖</mi><mi>𝑗</mi><mi>𝑘</mi><mi>𝑙</mi></mrow></msub></mfrac><mo>=</mo><munder><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑚</mi><mo rspace="0em">,</mo><mi>𝑛</mi></mrow></munder><mfrac><mrow><mi>𝜕</mi><msub><mi>𝑨</mi><mrow><mi>𝑖</mi><mi>𝑗</mi><mi>𝑚</mi><mi>𝑛</mi></mrow></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝑺</mi><mrow><mi>𝑖</mi><mi>𝑗</mi><mi>𝑘</mi><mi>𝑙</mi></mrow></msub></mrow></mfrac><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝑨</mi><mrow><mi>𝑖</mi><mi>𝑗</mi><mi>𝑚</mi><mi>𝑛</mi></mrow></msub></mrow></mfrac></math><p>where <math><mfrac><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac></math> is the Jacobian of softmax function and has size <math><mrow><mo>(</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>)</mo></mrow></math>. <math><mi>𝑖</mi><mo>,</mo><mi>𝑗</mi><mo>,</mo><mi>𝑘</mi><mo>,</mo><mi>𝑙</mi></math>: Indices of the target tensor <math><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac></math>. <math><mi>𝑚</mi><mo>,</mo><mi>𝑛</mi></math>: Summation indices, specifying contraction over these dimensions. The <math><msub><mo form="prefix" lspace="0em" rspace="0em">∑</mo><mrow><mi>𝑚</mi><mo rspace="0em">,</mo><mi>𝑛</mi></mrow></msub></math> explicitly indicates summation over the indices <math><mi>𝑚</mi></math> and <math><mi>𝑛</mi></math>.</p><p>For efficiency, we can rewrite the above equation as:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac><mo>=</mo><mi>𝑨</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac><mo>−</mo><msub><mrow><mo>(</mo><mrow><mi>𝑨</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>rowsum</mtext></msub></mrow><mo>)</mo></mrow><mspace width="1em"/><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mi>𝑙</mi></mrow><mo>]</mo></mrow><mo>−</mo><mrow><mo>[</mo><mrow><mi>𝑛</mi><mo>,</mo><mi>ℎ</mi><mo>,</mo><mi>𝑙</mi><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></math><p>where <math><mo lspace="0em" rspace="0em">∗</mo></math> denotes element-wise multiplication and <math><mtext>rowsum</mtext></math> sums over the last dimension.</p><h3 id="gradient-of-b">Gradient of <math><mi>𝑩</mi></math></h3><p>The gradient of <math><mi>𝑩</mi></math> is the same as the gradient of <math><mi>𝑺</mi></math>, which is:</p><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑩</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac></math><h3 id="gradient-of-q-k">Gradient of <math><mi>𝑸</mi></math>, <math><mi>𝑲</mi></math></h3><p>The gradient of <math><mi>𝑸</mi></math> and <math><mi>𝑲</mi></math> is:</p><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑸</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑲</mi></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑲</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑸</mi></mtd></mtr></mtable></math><h3 id="all-gradients">All gradients</h3><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑸</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑲</mi></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑲</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑸</mi></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑽</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><msup><mi>𝑨</mi><mi>𝑇</mi></msup><mspace width="0.2222em"/><mtext>bmm</mtext><mspace width="0.2222em"/><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑶</mi></mrow></mfrac><mspace width="0.2222em"/><mtext>bmm</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><msup><mi>𝑽</mi><mi>𝑇</mi></msup><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mi>𝑨</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac><mo>−</mo><msub><mrow><mo>(</mo><mrow><mi>𝑨</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">∗</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑨</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mtext>rowsum</mtext></msub></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑩</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>ℒ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝑺</mi></mrow></mfrac></mtd></mtr></mtable></math><h2 id="pytorch-implementation">PyTorch implementation</h2><pre><code data-lang="python"><span style="color: #d73948">import</span> torch
+
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">forward</span>(Q, K, V, B, d):
+    S <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(Q, K.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">-</span><span style="color: #b60157">2</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1</span>)) <span style="color: #d73948">/</span> torch.<span style="color: #4b69c6">sqrt</span>(torch.<span style="color: #4b69c6">tensor</span>(d, dtype<span style="color: #d73948">=</span>torch.float32)) <span style="color: #d73948">+</span> B
+    A <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">softmax</span>(S, dim<span style="color: #d73948">=</span><span style="color: #d73948">-</span><span style="color: #b60157">1</span>)
+    O <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(A, V)
+    <span style="color: #d73948">return</span> O, A, S
+
+<span style="color: #301414">@</span><span style="color: #301414">torch</span><span style="color: #301414">.</span><span style="color: #301414">no_grad</span>
+<span style="color: #d73948">def</span> <span style="color: #4b69c6">compute_gradients</span>(Q, K, V, B, d, dO):
+    <span style="color: #74747c">#</span><span style="color: #74747c"> Compute forward pass</span>
+    S <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(Q, K.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">-</span><span style="color: #b60157">2</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1</span>)) <span style="color: #d73948">/</span> torch.<span style="color: #4b69c6">sqrt</span>(torch.<span style="color: #4b69c6">tensor</span>(d, dtype<span style="color: #d73948">=</span>torch.float32)) <span style="color: #d73948">+</span> B
+    A <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">softmax</span>(S, dim<span style="color: #d73948">=</span><span style="color: #d73948">-</span><span style="color: #b60157">1</span>)
+    O <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(A, V)
+
+    <span style="color: #74747c">#</span><span style="color: #74747c"> Gradient of V and A</span>
+    dA <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(dO, V.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">-</span><span style="color: #b60157">2</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1</span>))
+    dV <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(A.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">-</span><span style="color: #b60157">2</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1</span>), dO)
+
+    <span style="color: #74747c">#</span><span style="color: #74747c"> Gradient of S using Jacobian-vector product (JVP)</span>
+    dS <span style="color: #d73948">=</span> dA <span style="color: #d73948">*</span> A <span style="color: #d73948">-</span> (A <span style="color: #d73948">*</span> dA).<span style="color: #4b69c6">sum</span>(dim<span style="color: #d73948">=</span><span style="color: #d73948">-</span><span style="color: #b60157">1</span>, keepdim<span style="color: #d73948">=</span><span style="color: #d73948">True</span>) <span style="color: #d73948">*</span> A
+    <span style="color: #74747c">#</span><span style="color: #74747c"> dS = dA * A - torch.matmul(dA * A, A.transpose(-2, -1))</span>
+
+    <span style="color: #74747c">#</span><span style="color: #74747c"> Gradient of B (same as dS)</span>
+    dB <span style="color: #d73948">=</span> dS.<span style="color: #4b69c6">clone</span>()
+
+    <span style="color: #74747c">#</span><span style="color: #74747c"> Gradient of Q and K</span>
+    dQ <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(dS, K) <span style="color: #d73948">/</span> torch.<span style="color: #4b69c6">sqrt</span>(torch.<span style="color: #4b69c6">tensor</span>(d, dtype<span style="color: #d73948">=</span>torch.float32))
+    dK <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">matmul</span>(dS.<span style="color: #4b69c6">transpose</span>(<span style="color: #d73948">-</span><span style="color: #b60157">2</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1</span>), Q) <span style="color: #d73948">/</span> torch.<span style="color: #4b69c6">sqrt</span>(torch.<span style="color: #4b69c6">tensor</span>(d, dtype<span style="color: #d73948">=</span>torch.float32))
+
+    <span style="color: #d73948">return</span> dQ, dK, dV, dB
+
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Example usage</span>
+n, h, l, d <span style="color: #d73948">=</span> <span style="color: #b60157">2</span>, <span style="color: #b60157">4</span>, <span style="color: #b60157">8</span>, <span style="color: #b60157">16</span>
+torch.<span style="color: #4b69c6">manual_seed</span>(<span style="color: #b60157">0</span>)
+Q <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">randn</span>(n, h, l, d, requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+K <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">randn</span>(n, h, l, d, requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+V <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">randn</span>(n, h, l, d, requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+B <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">randn</span>(n, h, l, l, requires_grad<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+dO <span style="color: #d73948">=</span> torch.<span style="color: #4b69c6">randn</span>(n, h, l, d)
+
+O, A, S <span style="color: #d73948">=</span> <span style="color: #4b69c6">forward</span>(Q, K, V, B, d)
+dQ, dK, dV, dB <span style="color: #d73948">=</span> <span style="color: #4b69c6">compute_gradients</span>(Q, K, V, B, d, dO)
+
+<span style="color: #74747c">#</span><span style="color: #74747c"> Verify correctness with autograd</span>
+O.<span style="color: #4b69c6">backward</span>(dO, retain_graph<span style="color: #d73948">=</span><span style="color: #d73948">True</span>)
+
+
+
+
+<span style="color: #4b69c6">print</span>( V.grad[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>])
+<span style="color: #4b69c6">print</span>( dV[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>]  )
+
+<span style="color: #4b69c6">print</span>( B.grad[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>])
+<span style="color: #4b69c6">print</span>( dB[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>]  )
+
+<span style="color: #4b69c6">print</span>( Q.grad[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>])
+<span style="color: #4b69c6">print</span>( dQ[<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>][<span style="color: #b60157">0</span>]  )
+
+
+
+<span style="color: #d73948">assert</span> torch.<span style="color: #4b69c6">allclose</span>(V.grad, dV, atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-5</span>), <span style="color: #198810">"</span><span style="color: #198810">dV mismatch</span><span style="color: #198810">"</span>
+<span style="color: #d73948">assert</span> torch.<span style="color: #4b69c6">allclose</span>(B.grad, dB, atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-5</span>), <span style="color: #198810">"</span><span style="color: #198810">dB mismatch</span><span style="color: #198810">"</span>
+<span style="color: #d73948">assert</span> torch.<span style="color: #4b69c6">allclose</span>(Q.grad, dQ, atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-5</span>), <span style="color: #198810">"</span><span style="color: #198810">dQ mismatch</span><span style="color: #198810">"</span>
+<span style="color: #d73948">assert</span> torch.<span style="color: #4b69c6">allclose</span>(K.grad, dK, atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-5</span>), <span style="color: #198810">"</span><span style="color: #198810">dK mismatch</span><span style="color: #198810">"</span>
+
+
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">Autograd verification passed.</span><span style="color: #198810">"</span>)
+
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">O:</span><span style="color: #198810">"</span>, O.shape)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">dQ:</span><span style="color: #198810">"</span>, dQ.shape)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">dK:</span><span style="color: #198810">"</span>, dK.shape)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">dV:</span><span style="color: #198810">"</span>, dV.shape)
+<span style="color: #4b69c6">print</span>(<span style="color: #198810">"</span><span style="color: #198810">dB:</span><span style="color: #198810">"</span>, dB.shape)</code></pre><p>Output:</p><pre><code data-lang="bash"><span style="color: #4b69c6">tensor</span>([-0.9583, -0.7990, -0.7401,  0.4045, -1.1326, -0.8535,  0.9846,  0.8070,
+        <span style="color: #4b69c6">-0.6478,</span> -0.0538,  0.6266,  1.0380, -0.9200,  0.5653,  0.9200, -0.0638])
+<span style="color: #4b69c6">tensor</span>([-0.9583, -0.7990, -0.7401,  0.4045, -1.1326, -0.8535,  0.9846,  0.8070,
+        <span style="color: #4b69c6">-0.6478,</span> -0.0538,  0.6266,  1.0380, -0.9200,  0.5653,  0.9200, -0.0638])
+<span style="color: #4b69c6">tensor</span>([-8.4880e-02, -6.7330e-01, -5.2291e-04,  3.3246e-02, -2.7012e-02,
+         <span style="color: #4b69c6">5.0888e-01,</span>  2.4558e-01, -1.9837e-03])
+<span style="color: #4b69c6">tensor</span>([-8.4880e-02, -6.7330e-01, -5.2293e-04,  3.3246e-02, -2.7012e-02,
+         <span style="color: #4b69c6">5.0888e-01,</span>  2.4558e-01, -1.9838e-03])
+<span style="color: #4b69c6">tensor</span>([-0.1274, -0.2580,  0.2316,  0.1266, -0.3056,  0.0579, -0.2824,  0.2191,
+        <span style="color: #4b69c6">-0.0199,</span>  0.2176, -0.0755, -0.1700,  0.1564,  0.2221, -0.0909,  0.0172])
+<span style="color: #4b69c6">tensor</span>([-0.1274, -0.2580,  0.2316,  0.1266, -0.3056,  0.0579, -0.2824,  0.2191,
+        <span style="color: #4b69c6">-0.0199,</span>  0.2176, -0.0755, -0.1700,  0.1564,  0.2221, -0.0909,  0.0172])
+<span style="color: #4b69c6">Autograd</span> verification passed.
+<span style="color: #4b69c6">O:</span> torch.Size(<span style="color: #d73948">[</span>2, 4, 8, 16<span style="color: #d73948">]</span>)
+<span style="color: #4b69c6">dQ:</span> torch.Size(<span style="color: #d73948">[</span>2, 4, 8, 16<span style="color: #d73948">]</span>)
+<span style="color: #4b69c6">dK:</span> torch.Size(<span style="color: #d73948">[</span>2, 4, 8, 16<span style="color: #d73948">]</span>)
+<span style="color: #4b69c6">dV:</span> torch.Size(<span style="color: #d73948">[</span>2, 4, 8, 16<span style="color: #d73948">]</span>)
+<span style="color: #4b69c6">dB:</span> torch.Size(<span style="color: #d73948">[</span>2, 4, 8, 8<span style="color: #d73948">]</span>)</code></pre></section></main></article><footer class="site-footer"><div class="site-footer__inner">© 2026 Xiaotian Han</div></footer><button type="button" class="to-top" aria-label="Back to top" title="Back to top">↑</button></body></html>

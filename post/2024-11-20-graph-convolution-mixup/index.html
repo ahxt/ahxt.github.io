@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Graph Convolution ≈ Mixup — Xiaotian Han</title><meta name="description" content="An intuitive explanation of graph convolution as a specialized form of Mixup, with experiments and visualizations."><meta name="author" content="Xiaotian Han"><link rel="canonical" href="https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/"><meta property="og:site_name" content="Xiaotian Han"><meta property="og:title" content="Graph Convolution ≈ Mixup"><meta property="og:description" content="An intuitive explanation of graph convolution as a specialized form of Mixup, with experiments and visualizations."><meta property="og:type" content="article"><meta property="og:url" content="https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/"><meta property="og:image" content="https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/intro.png"><meta property="article:published_time" content="2024-11-20"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Graph Convolution ≈ Mixup"><meta name="twitter:description" content="An intuitive explanation of graph convolution as a specialized form of Mixup, with experiments and visualizations."><meta name="twitter:image" content="https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/intro.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Graph Convolution ≈ Mixup",
+  "description": "An intuitive explanation of graph convolution as a specialized form of Mixup, with experiments and visualizations.",
+  "url": "https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/",
+  "mainEntityOfPage": "https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/",
+  "image": "https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/intro.png",
+  "inLanguage": "en",
+  "datePublished": "2024-11-20",
+  "author": {
+    "@type": "Person",
+    "name": "Xiaotian Han",
+    "url": "https://ahxt.github.io/"
+  }
+}</script><link rel="icon" href="../../favicon.svg?v=20260830-23" type="image/svg+xml"><link rel="icon" href="../../favicon.ico?v=20260830-23"><link rel="alternate" href="https://ahxt.github.io/feed.xml" type="application/atom+xml" title="Xiaotian Han — Posts"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&amp;family=Ubuntu+Mono:wght@400;700&amp;family=Noto+Sans+Math&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/atom-one-light.min.css"><script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.min.js" defer></script><link rel="stylesheet" href="../../assets/styles.css?v=20260830-23"><script src="../../assets/script.js?v=20260830-23" defer></script><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header class="site-header"><div class="site-header__inner"><a class="site-brand" href="../../.">Xiaotian Han</a><nav class="site-nav" aria-label="Primary"><a href="../../.">Home</a> <a href="../../post/" aria-current="page">Posts</a></nav><span hidden><a href="https://mapmyvisitors.com/web/1c4xw" title="Visit tracker"><img src="https://mapmyvisitors.com/map.png?d=HM5pqUc4d6kXiS4Wj_jHWzaZ531AEA-eUHA_BsCHuRo&amp;cl=ffffff" alt></a></span></div></header><article class="article"><aside class="article__toc" aria-label="Table of contents"><span class="article__toc-marker" aria-hidden="true"></span><ol><li><a href="#tldr">TL;DR</a></li><li><a href="#graph-convolution-mixup">Graph Convolution ≈ Mixup</a></li><li><a href="#experiments">Experiments</a></li></ol></aside><main class="article__main"><header class="post-header"><h1 class="post-title">Graph Convolution ≈ Mixup</h1><div class="post-byline"><ul class="post-authors"><li>Xiaotian Han</li></ul><span class="post-byline__sep" aria-hidden="true">·</span> <time datetime="2024-11-20">November 20, 2024</time></div></header><section class="prose"><p>This might be one of my most liked papers that probably reveals the essence of graph convolution. It is published on <a href="https://openreview.net/forum?id=koC6zyaj73">TMLR</a> and is selected as an Oral Presentation at LoG2024 TMLR Track. In this paper, we propose that graph convolution can be viewed as a specialized form of Mixup.</p><p><a href="https://arxiv.org/pdf/2310.00183">arXiv</a></p><h2 id="tldr">TL;DR</h2><p>This paper builds the relationship between graph convolution and Mixup techniques.</p><ul><li>Graph convolution aggregates features from neighboring samples for a specific node (sample).</li><li>Mixup generates new examples by averaging features and one-hot labels from multiple samples.</li></ul><p>The two share one commonality that information aggregation from multiple samples. We reveal that, under two mild modifications, graph convolution can be viewed as a specialized form of Mixup that is applied during both the training and testing phases if we assign the target node’s label to all its neighbors.</p><h2 id="graph-convolution-mixup">Graph Convolution ≈ Mixup</h2><p>Graph Neural Networks have recently been recognized as the <em>de facto</em> state-of-the-art algorithm for graph learning. The core idea behind GNNs is neighbor aggregation, which involves combining the features of a node’s neighbors. Specifically, for a target node with feature <math><msub><mi>𝒙</mi><mi>𝑖</mi></msub></math>, one-hot label <math><msub><mi>𝒚</mi><mi>𝑖</mi></msub></math>, and neighbor set <math><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></math>, the graph convolution operation in GCN is essentially as follows:</p><math display="block"><mrow><mo>(</mo><mrow><mover accent="true"><mi>𝒙</mi><mo>̃</mo></mover><mo>,</mo><mover accent="true"><mi>𝒚</mi><mo>̃</mo></mover></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub><mo stretchy="false">|</mo></mrow></mfrac><munder><mo form="prefix">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><msub><mi>𝒙</mi><mi>𝑘</mi></msub><mo>,</mo><msub><mi>𝒚</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></math><p>In parallel, Mixup is proposed to train deep neural networks effectively, which also essentially generates a new sample by averaging the features and labels of multiple samples:</p><math display="block"><mrow><mo>(</mo><mrow><mover accent="true"><mi>𝒙</mi><mo>̃</mo></mover><mo>,</mo><mover accent="true"><mi>𝒚</mi><mo>̃</mo></mover></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><munderover><mo lspace="0em">∑</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑁</mi></munderover><msub><mi>𝜆</mi><mi>𝑖</mi></msub><msub><mi>𝒙</mi><mi>𝑖</mi></msub><mo>,</mo><munderover><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑁</mi></munderover><msub><mi>𝜆</mi><mi>𝑖</mi></msub><msub><mi>𝒚</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow><mo>,</mo><mtext>s.t.</mtext><munderover><mo form="prefix">∑</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑁</mi></munderover><msub><mi>𝜆</mi><mi>𝑖</mi></msub><mo>=</mo><mn>1</mn></math><p>where <math><msub><mi>𝒙</mi><mi>𝑖</mi></msub></math>/<math><msub><mi>𝒚</mi><mi>𝑖</mi></msub></math> are the feature/label of sample <math><mi>𝑖</mi></math>. Mixup typically takes two data samples (<math><mi>𝑁</mi><mo>=</mo><mn>2</mn></math>).</p><p>The above two equations highlight a remarkable similarity between graph convolution and Mixup, i.e., <em>the manipulation of data samples through averaging the features</em>. This similarity prompts us to investigate the relationship between these two techniques as follows:</p><aside class="callout callout--note"><p class="callout__title">Question</p><strong>Is there a connection between graph convolution and Mixup?</strong></aside><p>In this paper, we answer this question by establishing the connection between graph convolutions and Mixup, and further understanding the graph neural networks through the lens of Mixup. We show that graph convolutions are intrinsically equivalent to Mixup by rewriting as follows:</p><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mrow><mo>(</mo><mrow><mover accent="true"><mi>𝒙</mi><mo>̃</mo></mover><mo>,</mo><mover accent="true"><mi>𝒚</mi><mo>̃</mo></mover></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub><mo stretchy="false">|</mo></mrow></mfrac><munder><mo form="prefix">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><msub><mi>𝒙</mi><mi>𝑘</mi></msub><mo>,</mo><msub><mi>𝒚</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><munder><mo lspace="0em">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub><mo stretchy="false">|</mo></mrow></mfrac><msub><mi>𝒙</mi><mi>𝑘</mi></msub><mo>,</mo><munder><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub><mo stretchy="false">|</mo></mrow></mfrac><msub><mi>𝒚</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><munder><mo lspace="0em">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><msub><mi>𝜆</mi><mi>𝑖</mi></msub><msub><mi>𝒙</mi><mi>𝑘</mi></msub><mo>,</mo><munder><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></mrow></munder><msub><mi>𝜆</mi><mi>𝑖</mi></msub><msub><mi>𝒚</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></mtd></mtr></mtable></math><p>where <math><msub><mi>𝜆</mi><mi>𝑖</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub><mo stretchy="false">|</mo></mrow></mfrac></math>, and <math><msub><mi>𝒙</mi><mi>𝑖</mi></msub></math> and <math><msub><mi>𝒚</mi><mi>𝑖</mi></msub></math> are the feature and label of the target node <math><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math>.</p><p>This above equation states that graph convolution is equivalent to Mixup if we assign the <math><msub><mi>𝒚</mi><mi>𝑖</mi></msub></math> to all the neighbors of node <math><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math> in set <math><msub><mi>𝒩︀</mi><mi>𝑖</mi></msub></math>.</p><figure><img src="intro.png" alt="Graph convolution ≈ Mixup" width="2566" height="1375" loading="lazy" decoding="async"><figcaption><span class="label">Figure 1.</span> Graph convolution ≈ Mixup</figcaption></figure><h2 id="experiments">Experiments</h2><p>The experiments with the public split on Cora, CiteSeer, and Pubmed datasets and the results are shown in the following table. The results show that MLP with mixup can achieve comparable performance to the original GCN.</p><figure><img src="table.png" alt="Performance comparison results" width="1198" height="532" loading="lazy" decoding="async"><figcaption><span class="label">Figure 2.</span> Performance comparison results</figcaption></figure><p>We experimented with different data splits of train/validation/test (the training data ratio span from <math><mn>10</mn><mi>%</mi><mo>−</mo><mn>90</mn><mi>%</mi></math>).</p><figure><img src="relabel.png" alt="Results with different data splits" width="1838" height="430" loading="lazy" decoding="async"><figcaption><span class="label">Figure 3.</span> Results with different data splits</figcaption></figure><p>With the test-time mixup (details in the paper), the MLPs with mixup can achieve comparable performance to the original GCN.</p><figure><img src="testtime.png" alt="Test-time mixup results" width="1746" height="760" loading="lazy" decoding="async"><figcaption><span class="label">Figure 4.</span> Test-time mixup results</figcaption></figure></section></main></article><footer class="site-footer"><div class="site-footer__inner">© 2026 Xiaotian Han</div></footer><button type="button" class="to-top" aria-label="Back to top" title="Back to top">↑</button></body></html>

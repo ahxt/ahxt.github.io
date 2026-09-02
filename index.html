@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Xiaotian Han</title><meta name="description" content="Xiaotian Han's technical blog on large language models, post-training, optimization, and GPU systems."><meta name="author" content="Xiaotian Han"><link rel="canonical" href="https://ahxt.github.io/"><meta property="og:site_name" content="Xiaotian Han"><meta property="og:title" content="Xiaotian Han"><meta property="og:description" content="Xiaotian Han's technical blog on large language models, post-training, optimization, and GPU systems."><meta property="og:type" content="website"><meta property="og:url" content="https://ahxt.github.io/"><meta property="og:image" content="https://ahxt.github.io/xt.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Xiaotian Han"><meta name="twitter:description" content="Xiaotian Han's technical blog on large language models, post-training, optimization, and GPU systems."><meta name="twitter:image" content="https://ahxt.github.io/xt.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "name": "Xiaotian Han",
+  "description": "Xiaotian Han's technical blog on large language models, post-training, optimization, and GPU systems.",
+  "url": "https://ahxt.github.io/",
+  "mainEntity": {
+    "@type": "Person",
+    "name": "Xiaotian Han",
+    "url": "https://ahxt.github.io/",
+    "image": "https://ahxt.github.io/xt.png",
+    "sameAs": [
+      "https://x.com/XiaotianHan1",
+      "https://scholar.google.com/citations?user=Uromx98AAAAJ",
+      "https://github.com/ahxt",
+      "https://www.linkedin.com/in/xiaotian-han-759a3358/"
+    ]
+  }
+}</script><link rel="icon" href="favicon.svg?v=20260830-23" type="image/svg+xml"><link rel="icon" href="favicon.ico?v=20260830-23"><link rel="alternate" href="https://ahxt.github.io/feed.xml" type="application/atom+xml" title="Xiaotian Han — Posts"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&amp;family=Ubuntu+Mono:wght@400;700&amp;family=Noto+Sans+Math&amp;display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/styles/atom-one-light.min.css"><script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.min.js" defer></script><link rel="stylesheet" href="assets/styles.css?v=20260830-23"><script src="assets/script.js?v=20260830-23" defer></script><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header class="site-header"><div class="site-header__inner"><a class="site-brand" href=".">Xiaotian Han</a><nav class="site-nav" aria-label="Primary"><a href="." aria-current="page">Home</a> <a href="post/">Posts</a></nav><span hidden><a href="https://mapmyvisitors.com/web/1c4xw" title="Visit tracker"><img src="https://mapmyvisitors.com/map.png?d=HM5pqUc4d6kXiS4Wj_jHWzaZ531AEA-eUHA_BsCHuRo&amp;cl=ffffff" alt></a></span></div></header><main class="home"><section class="home__hero"><div class="home__bio"><h1>Hi there!</h1><p>I am Xiaotian Han. I am training LLM at Amazon. I received my Ph.D. from Texas A&amp;M University.</p><p>I work on large language models post-training.</p><p class="home__contact"><a href="https://x.com/XiaotianHan1">𝕏</a> / <a href="https://scholar.google.com/citations?hl=en&amp;user=Uromx98AAAAJ&amp;view_op=list_works&amp;sortby=pubdate">Google Scholar</a> / <a href="https://github.com/ahxt">GitHub</a> / <a href="https://www.linkedin.com/in/xiaotian-han-759a3358/">LinkedIn</a></p></div></section><section class="home__section home__section--news"><h2 class="home__section-title">News</h2><ul><li><span class="news-date">2026.08</span>: Two papers on <a href="https://arxiv.org/abs/2510.12680">Hybrid Thinking</a> and <a href="https://arxiv.org/abs/2606.02908">WRIT</a> are accepted by EMNLP2026!</li><li><span class="news-date">2026.08</span>: Two papers on <a href="https://arxiv.org/abs/2604.08527">Demystifying OPD</a> and <a href="https://arxiv.org/abs/2604.27201">Path-Lock Expert</a> are accepted by COLM2026!</li><li><span class="news-date">2025.07</span>: One paper on <a href="https://arxiv.org/abs/2504.12329">Speculative Thinking</a> is accepted by COLM2025!</li><li><span class="news-date">2025.06</span>: I developed a <a href="https://typst.app/">Typst</a>-based homepage template and migrated my website to it! Check out <a href="https://github.com/ahxt/academic-homepage-typst">github repo</a>!</li><li><span class="news-date">2025.05</span>: New preprints on <a href="https://arxiv.org/abs/2504.12329">Speculative Thinking</a>, <a href="https://arxiv.org/abs/2505.17296">SELF</a>, and <a href="https://www.arxiv.org/abs/2505.17315">Longer Context, Deeper Thinking</a> form my group are out!</li></ul><details><summary>More →</summary><ul><li><span class="news-date">2025.05</span>: Two papers on <a href="https://arxiv.org/abs/2505.19293">💯-LongBench</a> and <a href="https://arxiv.org/abs/2503.19878">CausalRAG</a> accepted by ACL2025 Findings!</li><li><span class="news-date">2025.04</span>: Invited to serve as an Area Chair for NeurIPS2025!</li><li><span class="news-date">2025.02</span>: New preprint on <a href="https://arxiv.org/abs/2502.13173">Thinking Preference Optimization</a> is out!</li><li><span class="news-date">2025.02</span>: One paper on <a href="https://openreview.net/forum?id=XYMWd1wNlf">You Only Debias Once</a> is accepted by CPAL 2025 (Proceedings Track) Oral!</li><li><span class="news-date">2024.12</span>: Technical report of <a href="https://arxiv.org/pdf/2412.10743">NeuralPLexer3</a> for biomolecular complex structure prediction is out!</li><li><span class="news-date">2024.11</span>: <a href="https://openreview.net/forum?id=koC6zyaj73">Graph Convolution≈Mixup</a> is selected as Oral Presentation at LoG2024 TMLR Track!</li><li><span class="news-date">2024.08</span>: One paper on <a href="https://openreview.net/forum?id=koC6zyaj73">Understanding Graph Convolution</a> accepted by TMLR!</li><li><span class="news-date">2024.08</span>: Excited to join Case Western Reserve University as an assistant professor!</li><li><span class="news-date">2024.07</span>: I am excited to start my MLsys internship at <a href="https://www.iambic.ai/">Iambic Therapeutics</a></li><li><span class="news-date">2024.06</span>: <a href="https://arxiv.org/abs/2401.01325">LLM Maybe LongLM</a> has been selected as <strong class="text-spotlight">Spotlight (3.5%)</strong> at ICML2024!</li><li><span class="news-date">2024.05</span>: <a href="https://arxiv.org/pdf/2312.15194">One paper</a> is accepted by ACL2024!</li><li><span class="news-date">2024.04</span>: <a href="https://arxiv.org/abs/2401.01325">LLM Maybe LongLM: Self-Extend LLM Context Window Without Tuning</a> is accepted by ICML2024!</li><li><span class="news-date">2024.04</span>: My <a href="https://huggingface.co/ahxt/LiteLlama-460M-1T">LiteLLaMa</a> has been downloaded over 230K times on HuggingFace!</li><li><span class="news-date">2024.04</span>: Honored to receive the <a href="https://www.janestreet.com/join-jane-street/programs-and-events/grf-profiles-2024/">Jane Street Graduate Research Fellowship Award Honorable Mention</a>.</li><li><span class="news-date">2024.03</span>: Implemented <a href="https://github.com/openai/triton">Triton</a> based flash self-extend. Please try <a href="https://github.com/datamllab/LongLM/blob/master/self_extend_patch/selfextend_flash_attn_triton.py">FlashSelfExtend</a>!</li><li><span class="news-date">2024.01</span>: One paper on <a href="https://arxiv.org/pdf/2306.09468.pdf">Fairness Benchmark</a> accepted by ICLR2024!</li><li><span class="news-date">2024.01</span>: Our <a href="https://arxiv.org/abs/2304.13712">Survey on LLMs</a> accepted by TKDD!</li><li><span class="news-date">2024.01</span>: New preprint <a href="https://arxiv.org/abs/2401.01325">LLM Maybe LongLM: Self-Extend LLM Context Window Without Tuning</a>!</li><li><span class="news-date">2023.12</span>: One paper accepted by AAAI2024-SRRAI.</li><li><span class="news-date">2023.09</span>: One paper accepted by NeurIPS2023.</li><li><span class="news-date">2023.07</span>: 🔥🔥 Thrilled to release my <a href="https://huggingface.co/ahxt/LiteLlama-460M-1T">LiteLLaMa</a> on HuggingFace, try it out!</li><li><span class="news-date">2023.07</span>: Our paper <a href="https://arxiv.org/pdf/2303.04360.pdf">LLM for Clinical Text Mining</a> accepted by <a href="https://amia.org/education-events/amia-2023-annual-symposium">AMIA2023</a>!</li><li><span class="news-date">2023.05</span>: One paper accepted by TMLR, <a href="https://openreview.net/forum?id=LjDFIWWVVa">Retiring ∆DP</a>!</li><li><span class="news-date">2023.05</span>: Thrilled to start my internship at Amazon.</li><li><span class="news-date">2023.01</span>: One paper accepted by ICLR2023, <a href="https://arxiv.org/pdf/2210.00102.pdf">MLPInit</a>.</li><li><span class="news-date">2022.09</span>: Thrilled to start my internship at Meta, work with <a href="https://wqfcr.github.io/">Qifan Wang</a>.</li><li><span class="news-date">2022.07</span>: Our Paper <a href="https://arxiv.org/pdf/2202.07179.pdf">𝒢-Mixup</a> is awarded an Outstanding Paper Award at ICML 2022!</li><li><span class="news-date">2022.05</span>: Thrilled to start my internship at Snap Inc., work with <a href="http://nshah.net/">Neil Shah</a>.</li><li><span class="news-date">2022.05</span>: One paper accepted by ICML2022 (Oral).</li><li><span class="news-date">2022.01</span>: One paper accepted by ICLR2022.</li><li><span class="news-date">2022.01</span>: One paper accepted by TheWebConf2022.</li><li><span class="news-date">2020.05</span>: One paper accepted by RecSys2020.</li></ul></details></section></main><footer class="site-footer"><div class="site-footer__inner">© 2026 Xiaotian Han</div></footer><button type="button" class="to-top" aria-label="Back to top" title="Back to top">↑</button></body></html>

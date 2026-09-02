@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Xiaotian Han — Posts</title>
+  <id>https://ahxt.github.io/</id>
+  <link href="https://ahxt.github.io/feed.xml" rel="self"/>
+  <link href="https://ahxt.github.io/"/>
+  <updated>2025-06-17T00:00:00Z</updated>
+  <author><name>Xiaotian Han</name></author>
+  <entry>
+    <title>Group Relative Policy Optimization (GRPO)</title>
+    <id>https://ahxt.github.io/post/2025-06-17-grpo/</id>
+    <link href="https://ahxt.github.io/post/2025-06-17-grpo/"/>
+    <published>2025-06-17T00:00:00Z</published>
+    <updated>2025-06-17T00:00:00Z</updated>
+    <summary>A practical derivation of Group Relative Policy Optimization (GRPO), including its objective, implementation details, and relationship to PPO.</summary>
+  </entry>
+  <entry>
+    <title>Rotary Position Embeddings (RoPE)</title>
+    <id>https://ahxt.github.io/post/2025-03-18-rope/</id>
+    <link href="https://ahxt.github.io/post/2025-03-18-rope/"/>
+    <published>2025-03-18T00:00:00Z</published>
+    <updated>2025-03-18T00:00:00Z</updated>
+    <summary>A visual and mathematical guide to rotary position embeddings (RoPE), from the rotation formulation to efficient implementation.</summary>
+  </entry>
+  <entry>
+    <title>Optimizers: SGD, Momentum, and Adam</title>
+    <id>https://ahxt.github.io/post/2025-01-22-optimizer/</id>
+    <link href="https://ahxt.github.io/post/2025-01-22-optimizer/"/>
+    <published>2025-01-22T00:00:00Z</published>
+    <updated>2025-01-22T00:00:00Z</updated>
+    <summary>A from-scratch guide to SGD, momentum, and Adam, with PyTorch implementations and performance comparisons.</summary>
+  </entry>
+  <entry>
+    <title>LLM Technical Reports</title>
+    <id>https://ahxt.github.io/post/2025-01-21-llm-tech-reoport/</id>
+    <link href="https://ahxt.github.io/post/2025-01-21-llm-tech-reoport/"/>
+    <published>2025-01-21T00:00:00Z</published>
+    <updated>2025-01-21T00:00:00Z</updated>
+    <summary>A continuously updated collection of technical reports and notes on large language models.</summary>
+  </entry>
+  <entry>
+    <title>Scaling Test-Time Compute</title>
+    <id>https://ahxt.github.io/post/2024-12-30-inference-time-scaling-exp/</id>
+    <link href="https://ahxt.github.io/post/2024-12-30-inference-time-scaling-exp/"/>
+    <published>2024-12-30T00:00:00Z</published>
+    <updated>2024-12-30T00:00:00Z</updated>
+    <summary>Experiments on scaling test-time compute for language models, comparing majority voting, best-of-N, and FLOPs trade-offs.</summary>
+  </entry>
+  <entry>
+    <title>Softmax: Math, Implementation, and GPU Optimization</title>
+    <id>https://ahxt.github.io/post/2024-12-19-softmax/</id>
+    <link href="https://ahxt.github.io/post/2024-12-19-softmax/"/>
+    <published>2024-12-19T00:00:00Z</published>
+    <updated>2024-12-19T00:00:00Z</updated>
+    <summary>A mathematical and practical guide to softmax, including gradients, PyTorch implementations, and Triton GPU optimization.</summary>
+  </entry>
+  <entry>
+    <title>Optimizing Cross-Entropy Loss for LLMs</title>
+    <id>https://ahxt.github.io/post/2024-12-12-celoss/</id>
+    <link href="https://ahxt.github.io/post/2024-12-12-celoss/"/>
+    <published>2024-12-12T00:00:00Z</published>
+    <updated>2024-12-12T00:00:00Z</updated>
+    <summary>A guide to implementing and optimizing cross-entropy loss for large language models with PyTorch and Triton.</summary>
+  </entry>
+  <entry>
+    <title>Graph Convolution ≈ Mixup</title>
+    <id>https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/</id>
+    <link href="https://ahxt.github.io/post/2024-11-20-graph-convolution-mixup/"/>
+    <published>2024-11-20T00:00:00Z</published>
+    <updated>2024-11-20T00:00:00Z</updated>
+    <summary>An intuitive explanation of graph convolution as a specialized form of Mixup, with experiments and visualizations.</summary>
+  </entry>
+  <entry>
+    <title>FlashAttention with Trainable Bias Terms</title>
+    <id>https://ahxt.github.io/post/2024-10-20-attention/</id>
+    <link href="https://ahxt.github.io/post/2024-10-20-attention/"/>
+    <published>2024-10-20T00:00:00Z</published>
+    <updated>2024-10-20T00:00:00Z</updated>
+    <summary>A derivation and implementation of FlashAttention with trainable bias terms, including forward and backward passes.</summary>
+  </entry>
+</feed>
